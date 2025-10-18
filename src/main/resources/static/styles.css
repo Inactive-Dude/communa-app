@@ -1,0 +1,321 @@
+/* --- Global Styles & Font Import --- */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: #000000;
+  color: #ffffff;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+  -webkit-text-stroke: 0.75px black;
+  paint-order: stroke fill;
+}
+/* --- Main Content Wrapper --- */
+.content-wrapper {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding: 0 5%;
+}
+
+/* --- Header & Navigation --- */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2rem 0;
+  width: 100%;
+}
+
+.logo {
+  font-weight: 700;
+  font-size: 1.8rem;
+  color: #ffffff;
+}
+
+nav a {
+  margin-left: 2rem;
+  text-decoration: none;
+  color: #fff;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+nav a:hover {
+  color: #ffffff;
+}
+
+/* NEW RULE FOR ACTIVE LINK */
+nav a.active {
+  color: #ffffff;
+  font-weight: 700;
+}
+
+/* --- Main Content & Hero Section --- */
+main {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero {
+  text-align: center;
+  max-width: 800px;
+}
+
+.hero h1 {
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  font-weight: 700;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+
+.hero p {
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  color: #e0e0e0;
+  margin-bottom: 2.5rem;
+}
+
+.cta-button {
+  background-color: rgba(255, 255, 255, 0.2); /* Semi-transparent background */
+  color: #fff; /* White text */
+  border: 1px solid #fff; /* Added a border for visibility */
+  padding: 1rem 2.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.cta-button:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+/* --- Footer & Marquee --- */
+footer {
+  padding: 2rem 0;
+  border-top: 1px solid #333;
+  width: 100%;
+  text-align: center;
+  margin-top: auto;
+}
+
+footer h3 {
+  margin-bottom: 1rem;
+  color: #ffffff;
+}
+
+.separator {
+  color: #ffd700;
+  margin: 0 0.5em;
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 768px) {
+  nav {
+    display: none;
+  }
+
+  .logo {
+      font-size: 1.5rem;
+  }
+
+  .collage-item {
+    opacity: 0.5;
+  }
+
+  .item-5, .item-6, .item-7, .item-8, .item-9, .item-10 {
+      display: none;
+  }
+}
+
+/* --- Fluid Background Integration --- */
+
+/* 1. Position the canvas at the very back */
+#fluid-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1; /* Set to -1 to be behind everything */
+}
+
+/* 2. Make sure the content wrapper is positioned correctly */
+.content-wrapper, .profile-container, .content {
+    position: relative; /* This is required for z-index to work */
+    z-index: 2; /* Lifts the content above the background */
+}
+
+/* The main content wrapper is transparent to events by default. */
+.content-wrapper {
+  pointer-events: none;
+}
+
+/* Any element that needs to be clickable or interactive is opted back in. */
+.content-wrapper a,
+.content-wrapper button,
+.content-wrapper input {
+  pointer-events: auto;
+}
+
+/* Add these styles to your existing CSS file */
+
+#intro-video {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover; /* Ensures video covers screen without distortion */
+  z-index: 9999;     /* Keeps the video on top of all other content */
+  transition: opacity 1s ease-out; /* For a smooth fade-out of the video */
+}
+
+#main-content {
+  opacity: 0; /* Hides the content initially */
+  transition: opacity 1.5s ease-in; /* Defines the fade-in animation */
+}
+
+/* A helper class to be added by JavaScript */
+#main-content.fade-in {
+  opacity: 1; /* Makes the content visible */
+}
+
+/* --- Global Styles & Font Import --- */
+/* ... your existing styles ... */
+
+/* --- Header & Navigation --- */
+header {
+  /* ... your existing header styles ... */
+  /* We add a transition for a smooth fade-in later */
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+/* Initially hide the original header logo */
+#header-logo {
+    visibility: hidden;
+}
+
+/* --- STYLES FOR THE NEW ANIMATED LOGO --- */
+
+/* This is the initial state: Big, and in the center */
+#animated-logo {
+    position: fixed; /* Use fixed positioning to center it in the viewport */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* The classic centering trick */
+    font-size: 8vw; /* Large, responsive font size */
+    font-weight: 700;
+    color: #ffffff;
+    z-index: 1001; /* Make sure it's above other content but below the login popup */
+    opacity: 0; /* Start hidden */
+    pointer-events: none; /* Can't be clicked */
+    
+    /* THIS IS THE KEY FOR THE ANIMATION! */
+    /* Animate changes to these properties over 1 second */
+    transition: top 1s ease-in-out, left 1s ease-in-out, font-size 1s ease-in-out, opacity 1s ease-in-out;
+}
+
+/* This class will be added by JavaScript to trigger the animation */
+/* It defines the FINAL state of the logo */
+#animated-logo.moved {
+    top: 2rem; /* Matches header's top padding */
+    left: 5%;  /* Matches content-wrapper's left padding */
+    font-size: 1.8rem; /* Matches the original .logo font-size */
+    transform: translate(0, 0); /* Reset the centering transform */
+}
+
+
+/* ... rest of your CSS ... */
+
+/* In your existing .wrapper styles, make sure it has a high z-index */
+.wrapper {
+  position: relative;
+  /* ... other styles ... */
+  z-index: 1002; /* Ensure login form appears on top of the animated logo */
+}
+
+/* In styles.css */
+
+/* Initially hide the original header logo */
+#header-logo {
+    visibility: hidden;
+}
+
+/* Add this to styles.css */
+.logout-btn {
+  background: transparent;
+  border: 1px solid #ffffff;
+  color: #ffffff;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-left: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.logout-btn:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* --- Styles for the Header --- */
+header {
+  position: fixed; /* Makes the header stay at the top */
+  top: 20px;
+  left: 50%; /* Center the header */
+  transform: translateX(-50%);
+  width: 95%;
+  max-width: 1600px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  z-index: 100;
+
+  /* Liquid Glass Effect */
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* --- Style for the Logout Button --- */
+.logout-btn {
+  background: transparent;
+  border: 1px solid #ffffff;
+  color: #ffffff;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-left: 15px; /* Space before logout button */
+  transition: background-color 0.3s ease;
+}
+
+.logout-btn:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* --- Padding for Main Content --- */
+/* IMPORTANT: This stops content from being hidden under the fixed header */
+main {
+  padding-top: 120px;
+}

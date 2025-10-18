@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upcoming Events - IEEE(admin)</title>
+    <link rel="icon" type="image/png" href="Favicon.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="auth.js" defer></script>
+    <style>
+        /* --- Base Styles & Background --- */
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background-color: #0d0d0d;
+            color: #fff;
+        }
+
+        #fluid-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .content-wrapper {
+            position: relative;
+            z-index: 2;
+        }
+
+        @keyframes slideDownFadeIn {
+            from {
+                transform: translate(-50%, -150%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(-50%);
+                opacity: 1;
+            }
+        }
+
+        /* --- Glass Header --- */
+        header {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            width: 95%;
+            max-width: 1600px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 30px;
+            box-sizing: border-box;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            animation: slideDownFadeIn 1s ease-out forwards;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        nav a {
+            margin: 0 15px;
+            text-decoration: none;
+            color: #bfbfbf;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        nav a:hover {
+            color: #ffffff;
+        }
+        
+        .logout-btn {
+            background: transparent;
+            border: 1px solid #ffffff;
+            color: #ffffff;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* --- Main Content Layout --- */
+        main {
+            padding-top: 120px;
+        }
+
+        /* --- Styles for Club Content --- */
+        :root {
+            --sidebar-bg: #1a1a1a;
+            --card-bg: #242424;
+            --text-color: #E7E9EA;
+            --text-color-secondary: #71767B;
+            --accent-color: #1DA1F2;
+        }
+
+        .club-wrapper {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            max-width: 1400px;
+            margin: 20px auto;
+            gap: 20px;
+            padding: 0 20px;
+        }
+
+
+        /* ADD this combined rule for the glass effect */
+.club-sidebar, .club-content {
+    padding: 24px;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+}
+
+/* AND ADD this rule to keep the sidebar sticky */
+.club-sidebar {
+    height: fit-content;
+    position: sticky;
+    top: 120px;
+}
+
+        .club-sidebar h2 {
+            margin: 0 0 24px 0;
+            font-size: 24px;
+            text-align: center;
+        }
+
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            margin-bottom: 8px;
+            border-radius: 12px;
+            text-decoration: none;
+            color: var(--text-color);
+            font-size: 18px;
+            font-weight: 500;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        .sidebar-nav a:hover {
+            background-color: var(--card-bg);
+        }
+
+        .sidebar-nav a.active {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        .sidebar-nav i {
+            width: 24px;
+            margin-right: 16px;
+        }
+
+
+
+        .club-content h1 {
+            font-size: 36px;
+            margin: 0 0 30px 0;
+        }
+
+        /* --- Page Specific Styles for Events --- */
+        .admin-post-box {
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+
+        .admin-post-box h3 {
+            margin-top: 0;
+        }
+        
+        #add-event-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        #add-event-form input {
+            flex-grow: 1;
+            background-color: var(--sidebar-bg);
+            border: 1px solid var(--text-color-secondary);
+            border-radius: 8px;
+            color: var(--text-color);
+            padding: 12px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+        }
+
+        #add-event-form button {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            align-self: flex-end;
+        }
+
+        .event-card {
+            display: flex;
+            align-items: center;
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .event-card .date-box {
+            text-align: center;
+            margin-right: 20px;
+            padding-right: 20px;
+            border-right: 2px solid var(--accent-color);
+        }
+
+        .event-card .date-box .month {
+            font-size: 16px;
+            text-transform: uppercase;
+            font-weight: 600;
+            color: var(--accent-color);
+        }
+
+        .event-card .date-box .day {
+            font-size: 36px;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .event-card .details h3 {
+            margin: 0 0 8px 0;
+            font-size: 22px;
+        }
+
+        .event-card .details p {
+            margin: 0;
+            color: var(--text-color-secondary);
+        }
+
+        .event-card .details p i {
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="fluid-canvas"></canvas>
+
+    <div class="content-wrapper">
+        <header>
+            <div class="logo">Communa</div>
+            <nav>
+                <a href="newpage.html">Home</a>
+                <a href="Clubs.html">Clubs</a>
+                <a href="AboutUs.html">About Us</a>
+                <a href="Profile.html">Profile</a>
+                <a href="Help.html">Help</a>
+                <button onclick="logout()" class="logout-btn">Logout</button>
+            </nav>
+        </header>
+
+        <main>
+            <div class="club-wrapper">
+                <aside class="club-sidebar">
+                    <h2>IEEE</h2>
+                    <nav class="sidebar-nav">
+                        <a href="IEEE(admin).html"><i class="fa-solid fa-house"></i> Main</a>
+                        <a href="IEEE-announcements(admin).html"><i class="fa-solid fa-bullhorn"></i> Announcements</a>
+                        <a href="IEEE-events(admin).html" class ="active"><i class="fa-solid fa-calendar-days"></i> Upcoming Events</a>
+                    </nav>
+                </aside>
+
+                <section class="club-content">
+                    <h1>Upcoming Events</h1>
+
+                  <div class="admin-post-box">
+                        <h3>Add a New Event</h3>
+                        <form id="add-event-form">
+                            <div class="form-row">
+                                <input type="text" id="event-title-input" placeholder="Event Title" required>
+                                <input type="date" id="event-date-input" required>
+                            </div>
+                            <div class="form-row">
+                                <input type="text" id="event-time-input" placeholder="e.g., 9:00 AM - 5:00 PM" required>
+                                <input type="text" id="event-location-input" placeholder="Location" required>
+                            </div>
+                            <button type="submit">Add Event</button>
+                        </form>
+                    </div>
+
+                    <div id="events-list">
+                        <div class="event-card">
+                            <div class="date-box">
+                                <div class="month">OCT</div>
+                                <div class="day">15</div>
+                            </div>
+                            <div class="details">
+                                <h3>Treasure Hunt</h3>
+                                <p><i class="fa-solid fa-clock"></i> 9:00 AM - 9:00 PM</p>
+                                <p><i class="fa-solid fa-location-dot"></i> Main Auditorium</p>
+                            </div>
+                        </div>
+
+                        <div class="event-card">
+                            <div class="date-box">
+                                <div class="month">NOV</div>
+                                <div class="day">05</div>
+                            </div>
+                            <div class="details">
+                                <h3>Workshop: Intro to Spring Boot</h3>
+                                <p><i class="fa-solid fa-clock"></i> 4:00 PM - 6:00 PM</p>
+                                <p><i class="fa-solid fa-location-dot"></i> Seminar Hall B</p>
+                            </div>
+                        </div>
+                        
+                        <div class="event-card">
+                            <div class="date-box">
+                                <div class="month">NOV</div>
+                                <div class="day">21</div>
+                            </div>
+                            <div class="details">
+                                <h3>Guest Lecture: AI in Web Development</h3>
+                                <p><i class="fa-solid fa-clock"></i> 5:00 PM - 6:00 PM</p>
+                                <p><i class="fa-solid fa-location-dot"></i> Online via Zoom</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script src="scripts.js" defer></script>
+  <script>
+const baseUrl = "http://localhost:8082/api/events"; // Adjust port if needed
+const clubName = "IEEE"; // You can make this dynamic later
+
+const eventForm = document.getElementById('add-event-form');
+const eventsList = document.getElementById('events-list');
+
+eventForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const title = document.getElementById('event-title-input').value;
+    const date = document.getElementById('event-date-input').value;
+    const time = document.getElementById('event-time-input').value;
+    const location = document.getElementById('event-location-input').value;
+
+    if (!title || !date || !time || !location) {
+        alert("Please fill all fields");
+        return;
+    }
+
+    const eventData = {
+        clubName,
+        title,
+        date,
+        time,
+        location
+    };
+
+    try {
+        const response = await fetch(`${baseUrl}/add`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(eventData)
+        });
+
+        if (!response.ok) throw new Error("Failed to add event");
+
+        const newEvent = await response.json();
+        addEventToList(newEvent);
+        alert("Event added successfully!");
+        eventForm.reset();
+    } catch (error) {
+        console.error("Error adding event:", error);
+        alert("Failed to add event. Check backend connection.");
+    }
+});
+
+function addEventToList(event) {
+    const eventCard = document.createElement("div");
+    eventCard.classList.add("event-card");
+
+    const eventDate = new Date(event.date);
+    const month = eventDate.toLocaleString("en-US", { month: "short" }).toUpperCase();
+    const day = eventDate.getDate();
+
+    eventCard.innerHTML = `
+        <div class="date-box">
+            <div class="month">${month}</div>
+            <div class="day">${day}</div>
+        </div>
+        <div class="details">
+            <h3>${event.title}</h3>
+            <p><i class="fa-solid fa-clock"></i> ${event.time}</p>
+            <p><i class="fa-solid fa-location-dot"></i> ${event.location}</p>
+        </div>
+    `;
+    eventsList.prepend(eventCard);
+}
+</script>
+
+</body>
+</html>

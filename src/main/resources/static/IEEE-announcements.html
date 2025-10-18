@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Announcements - IEEE</title>
+    <link rel="icon" type="image/png" href="Favicon.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="auth.js" defer></script>
+
+    <style>
+        /* --- Base Styles --- */
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background-color: #0d0d0d;
+            color: #fff;
+        }
+
+        #fluid-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .content-wrapper {
+            position: relative;
+            z-index: 2;
+        }
+
+        @keyframes slideDownFadeIn {
+            from {
+                transform: translate(-50%, -150%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(-50%);
+                opacity: 1;
+            }
+        }
+
+        /* --- Header --- */
+        header {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            width: 95%;
+            max-width: 1600px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 30px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            animation: slideDownFadeIn 1s ease-out forwards;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        nav a {
+            margin: 0 15px;
+            text-decoration: none;
+            color: #bfbfbf;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        nav a:hover {
+            color: #ffffff;
+        }
+
+        .logout-btn {
+            background: transparent;
+            border: 1px solid #ffffff;
+            color: #ffffff;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        main {
+            padding-top: 120px;
+        }
+
+        /* --- Layout --- */
+        :root {
+            --sidebar-bg: #1a1a1a;
+            --card-bg: #242424;
+            --text-color: #E7E9EA;
+            --text-color-secondary: #71767B;
+            --accent-color: #1DA1F2;
+        }
+
+        .club-wrapper {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            max-width: 1400px;
+            margin: 20px auto;
+            gap: 20px;
+            padding: 0 20px;
+        }
+
+        .club-sidebar, .club-content {
+            padding: 24px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+        }
+
+        .club-sidebar {
+            height: fit-content;
+            position: sticky;
+            top: 120px;
+        }
+
+        .club-sidebar h2 {
+            margin: 0 0 24px 0;
+            font-size: 24px;
+            text-align: center;
+        }
+
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            margin-bottom: 8px;
+            border-radius: 12px;
+            text-decoration: none;
+            color: var(--text-color);
+            font-size: 18px;
+            font-weight: 500;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        .sidebar-nav a:hover {
+            background-color: var(--card-bg);
+        }
+
+        .sidebar-nav a.active {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        .sidebar-nav i {
+            width: 24px;
+            margin-right: 16px;
+        }
+
+        .club-content h1 {
+            font-size: 36px;
+            margin: 0 0 30px 0;
+        }
+
+        /* --- Announcement Styles --- */
+        .announcement-card {
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .announcement-card h3 {
+            margin: 0 0 8px 0;
+            font-size: 22px;
+        }
+
+        .announcement-card .date {
+            font-size: 14px;
+            color: var(--text-color-secondary);
+            margin-bottom: 12px;
+        }
+
+        .announcement-card p {
+            margin: 0;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="fluid-canvas"></canvas>
+
+    <div class="content-wrapper">
+        <header>
+            <div class="logo">Communa</div>
+            <nav>
+                <a href="newpage.html">Home</a>
+                <a href="Clubs.html">Clubs</a>
+                <a href="AboutUs.html">About Us</a>
+                <a href="Profile.html">Profile</a>
+                <a href="Help.html">Help</a>
+                <button onclick="logout()" class="logout-btn">Logout</button>
+            </nav>
+        </header>
+
+        <main>
+            <div class="club-wrapper">
+                <aside class="club-sidebar">
+                    <h2>IEEE</h2>
+                    <nav class="sidebar-nav">
+                        <a href="IEEE.html"><i class="fa-solid fa-house"></i> Main</a>
+                        <a href="IEEE-announcements.html" class="active"><i class="fa-solid fa-bullhorn"></i> Announcements</a>
+                        <a href="IEEE-events.html"><i class="fa-solid fa-calendar-days"></i> Upcoming Events</a>
+                    </nav>
+                </aside>
+
+                <section class="club-content">
+                    <h1>Announcements</h1>
+
+                    <div id="announcements-list">
+                        <p>Loading announcements...</p>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script src="scripts.js" defer></script>
+    <script>
+function logout() {
+    alert("You have been logged out.");
+    window.location.href = "index.html";
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+    const announcementsList = document.getElementById('announcements-list');
+
+    try {
+        const response = await fetch('http://localhost:8082/api/announcements/club/IEEE');
+        if (!response.ok) throw new Error("Failed to fetch announcements");
+        
+        const announcements = await response.json();
+
+        if (announcements.length === 0) {
+            announcementsList.innerHTML = "<p>No announcements found.</p>";
+            return;
+        }
+
+        announcementsList.innerHTML = "";
+
+        announcements.forEach(a => {
+            const card = document.createElement('div');
+            card.classList.add('announcement-card');
+            card.innerHTML = `
+                <h3>${a.title}</h3>
+                <div class="date">Posted on ${new Date(a.postedAt).toLocaleString()}</div>
+                <p>${a.description}</p>
+            `;
+            announcementsList.prepend(card);
+        });
+
+    } catch (err) {
+        console.error(err);
+        announcementsList.innerHTML = "<p>Failed to load announcements.</p>";
+    }
+});
+</script>
+
+</body>
+</html>

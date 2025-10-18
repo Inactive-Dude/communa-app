@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+
+    <title>Communa | College Clubs</title>
+    <link rel="icon" type="image/png" href="Favicon.png">
+    <link rel="stylesheet" href="style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <canvas id="fluid-canvas"></canvas>
+
+    <div id="video-container">
+        <video id="intro-video" autoplay muted playsinline>
+            <source src="intro.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    </div>
+
+    <header>
+        <h2 class="logo" id="header-logo">Communa</h2>
+        <nav class="navigation">
+            <button class="btnLogin-popup">Login</button>
+        </nav>
+    </header>
+
+    <div id="animated-logo">Communa</div>
+
+    <div id="choice-box">
+        <h2>Login As</h2>
+        <button id="userChoiceBtn" class="choice-btn">User</button>
+        <button id="adminChoiceBtn" class="choice-btn">Admin</button>
+    </div>
+
+    <div class="wrapper">
+        <div class="form-box login">
+            <h2>Login</h2>
+            <form id="loginForm" action="#" method="POST" novalidate>
+                <div class="input-box">
+                    <span class="icon">E-Mail</span>
+                    <input type="email" id="loginEmail" required />
+                </div>
+                <div class="input-box">
+                    <span class="icon">Password</span>
+                    <input type="password" id="loginPassword" required />
+                </div>
+                <div class="login-options">
+                    <a href="forgot-password.html" class="forgot-link">Forgot Password?</a>
+                </div>
+                <button type="submit" class="btn">Login</button>
+                <div class="login-register">
+                    <p>New here? <a href="#" class="register-link">Register</a></p>
+                </div>
+            </form>
+        </div>
+
+        <div class="form-box register">
+            <h2>Register</h2>
+            <form id="registerForm">
+                <div class="input-box"><span class="icon">Name</span><input type="text" id="registerName" required /></div>
+                <div class="input-box"><span class="icon">Admission Number</span><input type="text" id="registerAdmission" required /></div>
+                <div class="input-box"><span class="icon">E-Mail</span><input type="email" id="registerEmail" required /></div>
+                <div class="input-box"><span class="icon">Password</span><input type="password" id="registerPassword" required minlength="8"/></div>
+                <div class="input-box"><span class="icon">Confirm Password</span><input type="password" id="registerConfirmPassword" required /></div>
+                <button type="submit" class="btn">Register</button>
+                <div class="login-register"><p>Already have one? <a href="#" class="login-link">Login</a></p></div>
+            </form>
+        </div>
+    </div>
+
+    <script src="fluid.js"></script>
+    <script src="scripts.js"></script>
+    <script src="header-fluid.js" defer></script>
+    <script src="auth-helper.js"></script>
+
+    <script>
+        // --- API & AUTH LOGIC ---
+
+        async function handleLoginSubmit(event) {
+            event.preventDefault();
+            const email = document.getElementById("loginEmail").value.trim();
+            const password = document.getElementById("loginPassword").value;
+
+            if (!email || !password) {
+                alert("Please enter both email and password.");
+                return;
+            }
+
+            try {
+                const response = await fetch("http://localhost:8082/loginUser", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email: email, password: password }),
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.token) {
+                        setAuthToken(data.token); // From auth-helper.js
+                        setUserData(data);      // From auth-helper.js
+                        alert("Login successful!");
+                        window.location.replace("newpage.html");
+                    } else {
+                        alert("Login failed: No token received.");
+                    }
+                } else if (response.status === 401) {
+                    alert("Invalid email or password!");
+                } else {
+                    const errorText = await response.text();
+                    alert(`Server error: ${errorText}`);
+                }
+            } catch (error) {
+                console.error("Login API call failed:", error);
+                alert("Unable to connect to the server. Please check the console.");
+            }
+        }
+
+        async function handleRegisterSubmit(event) {
+            event.preventDefault();
+            const name = document.getElementById("registerName").value.trim();
+            const admission = document.getElementById("registerAdmission").value.trim();
+            const email = document.getElementById("registerEmail").value.trim();
+            const password = document.getElementById("registerPassword").value;
+            const confirm = document.getElementById("registerConfirmPassword").value;
+
+            if (password !== confirm) {
+                alert("Passwords do not match!");
+                return;
+            }
+            if (password.length < 8) {
+                alert("Password must be at least 8 characters long.");
+                return;
+            }
+
+            const newUser = { name, admissionNumber: admission, email, password };
+
+            try {
+                const response = await fetch("http://localhost:8082/addUser", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(newUser),
+                });
+
+                if (response.ok) {
+                    alert("Registration successful! Please login.");
+                    document.querySelector(".wrapper").classList.remove("active"); // Switch to login form
+                } else {
+                    const error = await response.json();
+                    alert(`Registration failed: ${error.error || "Unknown error"}`);
+                }
+            } catch (error) {
+                console.error("Register API call failed:", error);
+                alert("Error connecting to the registration service.");
+            }
+        }
+
+        // --- UI & ANIMATION LOGIC ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Select all elements
+            const videoContainer = document.getElementById('video-container');
+            const header = document.querySelector('header');
+            const wrapper = document.querySelector('.wrapper');
+            const animatedLogo = document.getElementById('animated-logo');
+            const headerLoginBtn = document.querySelector('.btnLogin-popup');
+            const finalHeaderLogo = document.getElementById('header-logo');
+            const loginLink = document.querySelector('.login-link');
+            const registerLink = document.querySelector('.register-link');
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            const choiceBox = document.getElementById('choice-box');
+            const userChoiceBtn = document.getElementById('userChoiceBtn');
+            const adminChoiceBtn = document.getElementById('adminChoiceBtn');
+
+            // --- Handle intro video ---
+            setTimeout(() => {
+                if (videoContainer) videoContainer.style.opacity = '0';
+                if (animatedLogo) animatedLogo.style.opacity = '1';
+                if (header) {
+                    header.style.opacity = '1';
+                    header.style.pointerEvents = 'auto';
+                }
+                setTimeout(() => {
+                    if (videoContainer) videoContainer.style.display = 'none';
+                }, 500);
+            }, 5000); // 5-second intro
+
+            // --- Main Login Flow ---
+            // 1. Header "Login" button shows the choice box
+            if (headerLoginBtn) {
+                headerLoginBtn.addEventListener('click', () => {
+                    if(choiceBox) choiceBox.style.display = 'block';
+                });
+            }
+
+            // 2. "Admin" button redirects
+            if (adminChoiceBtn) {
+                adminChoiceBtn.addEventListener('click', () => {
+                    window.location.href = 'Index(admin).html';
+                });
+            }
+
+            // 3. "User" button starts the popup animation
+            if (userChoiceBtn) {
+                userChoiceBtn.addEventListener('click', () => {
+                    if (choiceBox) choiceBox.style.display = 'none';
+                    if (animatedLogo) animatedLogo.classList.add('moved');
+                    
+                    setTimeout(() => {
+                        if (animatedLogo) animatedLogo.style.display = 'none';
+                        if (finalHeaderLogo) finalHeaderLogo.style.visibility = 'visible';
+                    }, 1000);
+
+                    setTimeout(() => {
+                        if (wrapper) wrapper.classList.add('active-popup');
+                    }, 700);
+                });
+            }
+
+            // --- Toggle between Login/Register forms ---
+            if (registerLink) {
+                registerLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    wrapper.classList.add('active');
+                });
+            }
+            if (loginLink) {
+                loginLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    wrapper.classList.remove('active');
+                });
+            }
+
+            // --- Attach Form Submit Handlers ---
+            if (loginForm) loginForm.addEventListener('submit', handleLoginSubmit);
+            if (registerForm) registerForm.addEventListener('submit', handleRegisterSubmit);
+        });
+    </script>
+</body>
+</html>

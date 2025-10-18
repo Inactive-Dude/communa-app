@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Communa | College Clubs</title>
+  <link rel="icon" type="image/png" href="Favicon.png">
+  <script src="auth.js" defer></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* --- Global Styles & Font Import --- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #000000;
+      color: #ffffff;
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+      /* ADDED FOR TEXT STROKE */
+      -webkit-text-stroke: 0.75px black;
+      paint-order: stroke fill;
+    }
+
+    /* --- Canvas Backgrounds --- */
+    #liquid-backdrop-alpha7 {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -2; 
+    }
+
+    /* --- DEEP ORANGE ETHER ANIMATIONS (REFINED) --- */
+    @keyframes ether-swirl-animation {
+      0%{ background-position: 0% 50%; }
+      50%{ background-position: 100% 50%; }
+      100%{ background-position: 0% 50%; }
+    }
+
+    @keyframes ether-glow-animation {
+      0%, 100% { 
+        box-shadow: 0 0 8px rgba(210, 90, 20, 0.2), inset 0 0 2px rgba(255, 255, 255, 0.05); 
+      }
+      50% { 
+        box-shadow: 0 0 18px rgba(255, 100, 0, 0.35), inset 0 0 2px rgba(255, 255, 255, 0.05); 
+      }
+    }
+    
+    @keyframes slideDownFadeIn {
+      from {
+        transform: translateY(-100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    /* --- REUSABLE DEEP ETHER FROSTED GLASS CLASS --- */
+    .frosted-glass {
+      background-color: rgba(20, 20, 20, 0.5);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      position: relative;
+      overflow: hidden;
+      animation: ether-glow-animation 9s ease-in-out infinite;
+    }
+
+    .frosted-glass::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      z-index: -1;
+      background-size: 250% 250%;
+      animation: ether-swirl-animation 22s ease-in-out infinite;
+      opacity: 0.9;
+    }
+    
+    /* --- Masonry Grid Background --- */
+    .mosaic-container-beta3 {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1; 
+      pointer-events: none;
+      overflow-y: scroll;
+      padding: 20px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-auto-rows: 50px;
+      gap: 20px;
+    }
+
+    .tile-element-gamma9 {
+      width: 100%;
+      background-size: cover;
+      background-position: center;
+      border-radius: 20px;
+      opacity: 1; 
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      animation: ether-glow-animation 9s ease-in-out infinite;
+    }
+    .tile-g1 { grid-row: span 4; }
+    .tile-g2 { grid-row: span 6; }
+    .tile-g3 { grid-row: span 5; }
+    .tile-g4 { grid-row: span 6; }
+    .tile-g5 { grid-row: span 4; }
+    .tile-g6 { grid-row: span 5; }
+    .tile-g7 { grid-row: span 5; }
+    .tile-g8 { grid-row: span 4; }
+    .tile-g9 { grid-row: span 6; }
+    .tile-g10 { grid-row: span 5; }
+
+    /* --- Main Content --- */
+    .main-view-delta4 {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      padding: 0 5%;
+    }
+
+    /* --- UNIFIED & CORRECTED HEADER STYLE --- */
+    header {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 102%;
+      max-width: 1600px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 30px;
+      z-index: 100;
+      border-radius: 50px;
+      box-sizing: border-box; 
+      animation: slideDownFadeIn 1s ease-out forwards;
+    }
+
+    .brand-emblem-zeta1 {
+      font-weight: bold;
+      font-size: 24px;
+      color: #ffffff;
+    }
+
+    nav a {
+      margin: 0 15px;
+      text-decoration: none;
+      color: #bfbfbf;
+      font-weight: 500;
+      transition: color 0.3s ease;
+    }
+    nav a:hover { color: #ffffff; }
+    nav a.active { color: #ffffff; font-weight: 700; }
+    
+    main {
+      flex-grow: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding-top: 150px;
+    }
+
+    .banner-section-lambda5 {
+      text-align: center;
+      max-width: 800px;
+    }
+    .banner-section-lambda5 h1 {
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 700;
+      margin-bottom: 1rem;
+      line-height: 1.2;
+    }
+    .banner-section-lambda5 p {
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      color: #e0e0e0;
+      margin-bottom: 2.5rem;
+    }
+
+    .action-trigger-mu2 {
+      color: #fff;
+      border: none;
+      padding: 1rem 2.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+      -webkit-text-stroke: 0; /* Remove stroke from button */
+    }
+    .action-trigger-mu2:hover { transform: scale(1.05); }
+
+    .session-exit-kappa8 {
+      background: transparent;
+      border: 1px solid #ffffff;
+      color: #ffffff;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      margin-left: 15px;
+      transition: background-color 0.3s ease;
+      -webkit-text-stroke: 0; /* Remove stroke from button */
+    }
+    .session-exit-kappa8:hover { background-color: rgba(255, 255, 255, 0.2); }
+
+    /* --- Footer --- */
+    footer {
+      padding: 2rem 0;
+      border-top: 1px solid #333;
+      width: 100%;
+      text-align: center;
+      margin-top: auto;
+    }
+    footer h3 { margin-bottom: 1rem; color: #ffffff; }
+    .divider-omega6 { color: #ffd700; margin: 0 0.5em; }
+
+    /* --- Responsive Adjustments --- */
+    @media (max-width: 1200px) { .mosaic-container-beta3 { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 768px) {
+      nav { display: none; }
+      .brand-emblem-zeta1 { font-size: 1.5rem; }
+      .mosaic-container-beta3 { grid-template-columns: repeat(2, 1fr); }
+      .tile-element-gamma9 { opacity: 1; } 
+    }
+  </style>
+</head>
+<body>
+  <canvas id="liquid-backdrop-alpha7"></canvas>
+  <div class="mosaic-container-beta3">
+    <div class="tile-element-gamma9 tile-g1" style="background-image: url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit-crop&w=800&q=60');"></div>
+    <div class="tile-element-gamma9 tile-g2" style="background-image: url('https://images.unsplash.com/photo-1541339907198-e0875663f974?auto=format&fit-crop&w=600&q=60');"></div>
+    <div class="tile-element-gamma9 tile-g3" style="background-image: url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit-crop&w=800&q=60');"></div>
+    <div class="tile-element-gamma9 tile-g4" style="background-image: url('https://images.unsplash.com/photo-1531545514256-b1400bc00f31?auto=format&fit-crop&w=700&q=60');"></div>
+    <div class="tile-element-gamma9 tile-g5" style="background-image: url('https://images.unsplash.com/photo-1509062522237-f82337775071?auto=format&fit-crop&w=600&q=60');"></div>
+    <div class="tile-element-gamma9 tile-g6" style="background-image: url('https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?auto=format&fit-crop&w=800&q=60');"></div>
+    <div class="tile-element-gamma9 tile-g7" style="background-image: url('https://images.unsplash.com/photo-1509281358316-f76156cfd74e?auto=format&fit-crop&w=700&q=60');"></div>
+    <div class="tile-element-gamma9 tile-g8" style="background-image: url('https://images.unsplash.com/photo-1523050854058-df90110c9f1?auto=format&fit-crop&w=600&q=60');"></div>
+    <div class="tile-element-gamma9 tile-g9" style="background-image: url('https://images.unsplash.com/photo-1523050854058-df90110c9f1?auto=format&fit-crop&w=600&q=60');"></div>
+    <div class="tile-element-gamma9 tile-g10" style="background-image: url('https://images.unsplash.com/photo-1521737604893-d14cc237f111?auto=format&fit-crop&w=800&q=60');"></div>
+  </div>
+
+  <div class="main-view-delta4">
+    <header class="frosted-glass">
+      <div class="brand-emblem-zeta1">Communa</div>
+      <nav>
+        <a href="newpage.html">Home</a>
+        <a href="Clubs.html">Clubs</a>
+        <a href="AboutUs.html">About Us</a>
+        <a href="Profile.html">Profile</a>
+        <a href="Help.html">Help</a>
+        <button onclick="logout()" class="nav-button session-exit-kappa8">Logout</button>
+      </nav>
+    </header>
+
+    <main>
+      <section class="banner-section-lambda5">
+        <h1>Discover. Join. Connect.</h1>
+        <p>All your college clubs in one place.</p>
+        <a href="Clubs.html"><button class="action-trigger-mu2 frosted-glass">Explore Clubs</button></a>
+      </section>
+    </main>
+
+    <footer>
+      <h3>Announcements</h3>
+      <marquee>
+        <b>
+          <span class="divider-omega6">*</span> IEEE is conducting a subcommittee drive
+          <span class="divider-omega6">*</span> IEDC is hosting an ideathon program
+        </b>
+      </marquee>
+    </footer>
+  </div>
+
+
+  <script src="auth.js"></script>
+
+  
+  <script>
+    function logout() {
+      // This function will redirect the user to the login page
+      alert("You have been logged out.");
+      window.location.href = "index.html";
+    }
+  </script>
+  <script src="scripts.js"></script>
+</body>
+</html>

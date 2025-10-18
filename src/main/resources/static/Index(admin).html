@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+
+    <title>Communa | College Clubs</title>
+    <link rel="icon" type="image/png" href="Favicon.png">
+    <link rel="stylesheet" href="style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="auth.js" defer></script>
+</head>
+<body>
+
+    <canvas id="fluid-canvas"></canvas>
+
+    <div id="video-container">
+        <video id="intro-video" autoplay muted playsinline>
+            <source src="intro.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    </div>
+
+    <header>
+        <h2 class="logo" id="header-logo">Communa</h2>
+        <nav class="navigation">
+            <button class="btnLogin-popup">Login</button>
+        </nav>
+    </header>
+
+    <div id="animated-logo">Communa Pro</div>
+
+    <div class="wrapper">
+        <div class="form-box login">
+            <h2>Login</h2>
+            <form id="loginForm" action="#" method="POST">
+                <div class="input-box">
+                    <span class="icon">E-Mail</span>
+                    <input type="email" id="userId" required />
+                </div>
+                <div class="input-box">
+                    <span class="icon">Password</span>
+                    <input type="password" id="password" required />
+                </div>
+                <button type="submit" class="btn">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="fluid.js"></script>
+    <script src="header-fluid.js" defer></script>
+    <script>
+        // === MAIN LOGIN + LOGOUT CODE ===
+        async function handleSubmit(event) {
+            event.preventDefault();
+
+            const email = document.getElementById("userId").value;
+            const password = document.getElementById("password").value;
+
+            const loginData = { email, password };
+
+            try {
+                const response = await fetch('http://localhost:8082/api/admin/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(loginData),
+                });
+
+                if (response.ok) {
+                    const admin = await response.json();
+
+                    localStorage.setItem("admin", JSON.stringify(admin));
+                    sessionStorage.setItem("loggedIn", "true");
+
+                    alert("Login successful!");
+
+                    // Redirect to club-specific admin page
+                    const clubPage = `${admin.clubName}(admin).html`;
+                    window.location.replace(clubPage);
+
+                } else if (response.status === 401) {
+                    alert("Invalid email or password!");
+                } else {
+                    alert("Something went wrong. Try again.");
+                }
+
+            } catch (error) {
+                console.error(error);
+                alert("Error connecting to server.");
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem("admin");
+            sessionStorage.clear();
+            window.location.replace("index.html");
+        }
+
+        // === EXTRA UI / ANIMATION LOGIC ===
+        document.addEventListener('DOMContentLoaded', () => {
+            const videoContainer = document.getElementById('video-container');
+            const header = document.querySelector('header');
+            const wrapper = document.querySelector('.wrapper');
+            const animatedLogo = document.getElementById('animated-logo');
+            const loginButton = document.querySelector('.btnLogin-popup');
+            const finalHeaderLogo = document.getElementById('header-logo');
+            const loginForm = document.getElementById('loginForm');
+
+            // --- Handle intro video ---
+            function showIntroContent() {
+                if (videoContainer) {
+                    videoContainer.style.opacity = '0';
+                    setTimeout(() => {
+                        videoContainer.style.display = 'none';
+                    }, 500);
+                }
+                if (animatedLogo) animatedLogo.style.opacity = '1';
+                if (header) {
+                    header.style.opacity = '1';
+                    header.style.pointerEvents = 'auto';
+                }
+            }
+            setTimeout(showIntroContent, 5000);
+
+            // --- Login button popup animation ---
+            if (loginButton) {
+                loginButton.addEventListener('click', () => {
+                    if (animatedLogo) animatedLogo.classList.add('moved');
+                    setTimeout(() => {
+                        if (animatedLogo) animatedLogo.style.display = 'none';
+                        if (finalHeaderLogo) finalHeaderLogo.style.visibility = 'visible';
+                    }, 1000);
+                    setTimeout(() => {
+                        if (wrapper) wrapper.classList.add('active-popup');
+                    }, 700);
+                });
+            }
+
+            // --- Hook real login handler ---
+            if (loginForm) {
+                loginForm.addEventListener('submit', handleSubmit);
+            }
+        });
+    </script>
+</body>
+</html>

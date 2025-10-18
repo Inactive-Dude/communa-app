@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help Desk - Bot Chat</title>
+    <link rel="icon" type="image/png" href="Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="auth.js" defer></script>
+    <style>
+        /* --- Base Styles --- */
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background-color: #0d0d0d;
+            color: #fff;
+            /*overflow: hidden;  Prevent scrollbars from fluid canvas */
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Center content horizontally */
+            min-height: 100vh; /* Ensure body takes full viewport height */
+        }
+
+        /* --- Fluid Background --- */
+        #fluid-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        
+        /* --- Keyframe Animation for Header --- */
+        @keyframes slideDownFadeIn {
+            from {
+                transform: translate(-50%, -100%);
+                opacity: 0;
+            }
+            to {
+                transform: translate(-50%, 0);
+                opacity: 1;
+            }
+        }
+
+        /* --- Glass Ribbon Header (Menu Bar) --- */
+        header {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 95%;
+            max-width: 1600px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 30px;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            animation: slideDownFadeIn 1s ease-out forwards;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        nav a {
+            margin: 0 15px;
+            text-decoration: none;
+            color: #bfbfbf;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        nav a:hover {
+            color: #ffffff;
+        }
+        
+        .logout-btn {
+            background: transparent;
+            border: 1px solid #ffffff;
+            color: #ffffff;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+            cursor: pointer;
+            margin-left: 15px;
+            transition: background-color 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* --- Main Content Area --- */
+        .content-wrapper {
+            position: relative;
+            z-index: 2;
+            padding-top: 120px; /* Pushes content down below header */
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Centers content horizontally */
+            text-align: center;
+            flex-grow: 1; /* Allows it to take up available vertical space */
+            justify-content: center; /* Centers items vertically within content-wrapper */
+            width: 100%; /* Ensure it spans the full width */
+        }
+        
+        .help-title { 
+            font-size: 48px; 
+            font-weight: bold; 
+            color: #ffffff;
+            margin-bottom: 8px; 
+        }
+
+        .help-subtitle { 
+            color: #bfbfbf; 
+            font-size: 20px; 
+            margin-bottom: 30px;
+        }
+
+        /* --- Chat Container (Modified for this layout) --- */
+        .chat-container {
+            width: 450px; /* Slightly wider for better appearance */
+            height: 550px; /* Slightly shorter to fit on screen with header and text */
+            background: rgba(10, 10, 10, 0.6); /* Darker, more opaque glass for distinction */
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .messages {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            /* Scrollbar styling for better aesthetic */
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+        }
+
+        .messages::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .messages::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .messages::-webkit-scrollbar-thumb {
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            border: 2px solid transparent;
+        }
+
+        .message {
+            padding: 10px 15px;
+            border-radius: 18px;
+            margin-bottom: 10px;
+            max-width: 75%; /* Allow messages to be a bit wider */
+            line-height: 1.4;
+            overflow-wrap: break-word;
+            text-align: left;
+        }
+
+        .user-message {
+            background-color: #14f069;
+            color: black; /* Good contrast on green */
+            align-self: flex-end;
+            margin-left: auto;
+        }
+
+        .bot-message {
+            background-color: #6596d1;
+            color: white; /* Good contrast on blue */
+            align-self: flex-start;
+        }
+
+        .chat-form {
+            display: flex;
+            padding: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .chat-form input {
+            flex-grow: 1;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background-color: rgba(255, 255, 255, 0.05);
+            color: white;
+            border-radius: 20px;
+            padding: 10px 15px;
+            font-size: 16px;
+        }
+
+        .chat-form input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .chat-form button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            margin-left: 10px;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .message a {
+            color: inherit;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="fluid-canvas"></canvas>
+
+    <header>
+      <div class="logo">Communa</div>
+      <nav>
+        <a href="newpage.html">Home</a>
+        <a href="Clubs.html">Clubs</a>
+        <a href="AboutUs.html">About Us</a>
+        <a href="Profile.html">Profile</a>
+        <a href="Help.html">Help</a>
+        <button onclick="logout()" class="logout-btn">Logout</button>
+      </nav>
+    </header>
+
+    <main class="content-wrapper">
+        <h1 class="help-title">Help Desk</h1>
+        <p class="help-subtitle">Welcome! Our AI assistant, Communa, is here to answer your questions about the site, clubs, or just chat. Feel free to ask anything!</p>
+
+        <div class="chat-container">
+            <div class="messages" id="messages"></div>
+            <form class="chat-form" id="chat-form">
+                <input type="text" id="message-input" placeholder="Type a message..." autocomplete="off">
+                <button type="submit">➤</button>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        // --- Logout Function ---
+        function logout() {
+          alert("You have been logged out.");
+          window.location.href = "index.html"; 
+        }
+
+        // Get references to the HTML elements - DECLARED ONCE
+        const chatForm = document.getElementById('chat-form');
+        const messageInput = document.getElementById('message-input');
+        const messagesContainer = document.getElementById('messages');
+
+        // --- GAME STATE MANAGEMENT - DECLARED ONCE ---
+        let currentGame = null; // Can be 'handCricket', 'guessTheNumber', 'rockPaperScissors', or null
+        let guessTheNumberState = {};
+        let handCricketState = {};
+
+        // Helper function for random responses - DECLARED ONCE
+        const getRandom = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
+        // This function creates and displays a message bubble
+        function displayMessage(message, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', sender === 'user' ? 'user-message' : 'bot-message');
+
+            // Convert markdown-style links [text](url) to HTML <a> tags
+            const formattedMessage = message.replace(
+                /\[(.*?)\]\((.*?)\)/g,
+                '<a href="$2" target="_blank">$1</a>'
+            );
+
+            messageDiv.innerHTML = formattedMessage;
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // ==================================================================
+        //  MAIN BOT LOGIC - Unified Event Listener
+        // ==================================================================
+        chatForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const userMessage = messageInput.value;
+            if (userMessage.trim() === '') return;
+            
+            displayMessage(userMessage, 'user');
+            messageInput.value = '';
+
+            setTimeout(() => {
+                const botMessage = getBotResponse(userMessage);
+                displayMessage(botMessage, 'bot');
+            }, 800); // Slightly faster response time for better feel
+        });
+
+        // Initial greeting from the bot
+        setTimeout(() => {
+            displayMessage("Hello! I'm Communa, your AI assistant. Ask me questions, or say 'play a game' if you're bored!", 'bot');
+        }, 1000);
+
+        // ==================================================================
+        //  THE UNIFIED getBotResponse FUNCTION
+        // ==================================================================
+
+        function getBotResponse(userInput) {
+            const text = userInput.toLowerCase().trim();
+            const now = new Date();
+
+            // --- Universal "end game" command ---
+            if (currentGame && (text === 'end' || text === 'break' || text.includes('stop game'))) {
+                return endGame();
+            }
+
+            // --- If a game is active, route input to the game handler FIRST ---
+            if (currentGame) {
+                if (currentGame === 'guessTheNumber') return handleGuessTheNumber(text);
+                if (currentGame === 'rockPaperScissors') return handleRockPaperScissors(text);
+                if (currentGame === 'handCricket') return handleHandCricket(text);
+            }
+
+            // --- Game Triggers (only if no game is active) ---
+            if (text.includes("play a game") || text.includes("i am bored") || text.includes("i'm bored") || text.includes("play something")) {
+                return `I'd love to play! Which game would you like to try?<br>
+                        1. <b>Guess the Number</b><br>
+                        2. <b>Rock, Paper, Scissors</b><br>
+                        3. <b>Hand Cricket</b><br>
+                        Just type the name of the game to start!`;
+            }
+            // Start a specific game if requested
+            if (text.includes("guess the number")) return startGame('guessTheNumber');
+            if (text.includes("rock paper scissors")) return startGame('rockPaperScissors');
+            if (text.includes("hand cricket")) return startGame('handCricket');
+
+            // --- 1. Enhanced Chit-Chat & Personality ---
+            if (text.includes("hello") || text.includes("hi") || text.includes("hey")) {
+                const greetings = ["Hello there! How can I assist you with Communa today?", "Hi! What can I help you find?", "Hey! I'm here to help with any questions about the clubs."];
+                return getRandom(greetings);
+            } else if (text.includes("how are you")) {
+                const feelings = ["I'm a program, so I'm running perfectly!", "I'm doing great, thanks for asking! Ready to help.", "Functioning at 100% capacity! What's on your mind?"];
+                return getRandom(feelings);
+            } else if (text.includes("thank you") || text.includes("thanks")) {
+                return "You're welcome! Is there anything else I can help you with?";
+            } else if (text.includes("bye") || text.includes("goodbye")) {
+                return "Goodbye! Have a great day!";
+            } else if (text.includes("your name")) {
+                return "You can call me Communa. I'm the AI assistant for this site.";
+            } else if (text.includes("who are you")) {
+                return "I am Communa, the AI chatbot for this club management site. I can help with questions about clubs, site features, and even some general knowledge.";
+            } else if (text.includes("created you") || text.includes("made you")) {
+                return "I was created by the talented developers of Group 1 to make your experience on this site better.";
+            } else if (text.includes("you are smart") || text.includes("you're cool") || text.includes("you are awesome")) {
+                return "Thank you! I'm always learning and trying to be as helpful as possible.";
+            } else if (text.includes("are you human") || text.includes("are you a robot")) {
+                return "I'm a sophisticated AI, which means I'm a program running on a server. I'm not human, but I'm here to help humans like you!";
+            } else if (text.includes("what is your purpose") || text.includes("what can you do")) {
+                return "My purpose is to assist you! I can answer questions about site features, help you find information about clubs, tell jokes, and even perform simple calculations.";
+            } else if (text.includes("i'm bored") || text.includes("im bored")) {
+                // Already handled by game triggers, but if it falls through, give a game suggestion.
+                return "Boredom is the enemy of progress! How about we 'play a game' or I tell you a fun fact or a joke?";
+            }
+
+            // --- 2. Jokes, Facts, and Creative Tasks ---
+            else if (text.includes("tell me a joke") || text.includes("joke")) {
+                const jokes = [
+                    "Why don't scientists trust atoms? Because they make up everything!",
+                    "I told my computer I needed a break, and now it won’t stop sending me Kit-Kat ads.",
+                    "Why did the scarecrow win an award? Because he was outstanding in his field!",
+                    "What do you call a fake noodle? An Impasta!",
+                    "Why was the JavaScript developer sad? Because he didn't know how to 'null' his feelings."
+                ];
+                return getRandom(jokes);
+            } else if (text.includes("tell me a fact") || text.includes("fun fact")) {
+                const facts = [
+                    "A single cloud can weigh more than 1 million pounds.",
+                    "The national animal of Scotland is the unicorn.",
+                    "The first computer programmer was a woman named Ada Lovelace.",
+                    "Honey never spoils. Archaeologists have found pots of honey in ancient Egyptian tombs that are over 3,000 years old and still perfectly edible.",
+                    "There are more possible iterations of a game of chess than there are atoms in the known universe."
+                ];
+                return getRandom(facts);
+            } else if (text.includes("tell me a story")) {
+                return "Once upon a time, in a world of pure data, a young algorithm dreamed of sorting not just numbers, but emotions. It learned and grew, and one day, it became an AI that could help people connect, much like the clubs on this very site. The end... for now!";
+            } else if (text.includes("give me a quote") || text.includes("quote")) {
+                const quotes = [
+                    "\"The only way to do great work is to love what you do.\" - Steve Jobs",
+                    "\"The future belongs to those who believe in the beauty of their dreams.\" - Eleanor Roosevelt",
+                    "\"Code is like humor. When you have to explain it, it’s bad.\" - Cory House",
+                    "\"The best way to predict the future is to invent it.\" - Alan Kay"
+                ];
+                return getRandom(quotes);
+            }
+
+            // --- 3. Dynamic & Contextual Responses ---
+            else if (text.includes("what time is it") || text.includes("what is the time")) {
+                return `The current time is ${now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true })}.`;
+            } else if (text.includes("what is the date") || text.includes("today's date")) {
+                return `Today is ${now.toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}.`;
+            } else if (text.includes("what day is it") || text.includes("today is")) {
+                return `Today is ${now.toLocaleDateString('en-IN', { weekday: 'long' })}.`;
+            } else if (text.includes("what is") && text.match(/\d+\s*([+\-*/])\s*\d+/)) { // Simple Calculator
+                const calcMatch = text.match(/(\d+)\s*([+\-*/])\s*(\d+)/);
+                if (calcMatch) {
+                    const num1 = parseInt(calcMatch[1]);
+                    const operator = calcMatch[2];
+                    const num2 = parseInt(calcMatch[3]);
+                    let result;
+                    if (operator === '+') result = num1 + num2;
+                    else if (operator === '-') result = num1 - num2;
+                    else if (operator === '*') result = num1 * num2;
+                    else if (operator === '/') result = num2 !== 0 ? num1 / num2 : 'undefined (cannot divide by zero)';
+                    if (result !== undefined) {
+                        return `The answer is ${result}.`;
+                    }
+                }
+            }
+
+            // --- 4. Deep Site-Specific Knowledge & Links ---
+            else if ((text.includes("pay") || text.includes("payment") || text.includes("fee")) && text.includes("how")) {
+                return "For paid clubs like IEEE or CSI, the payment process is handled by the club itself. You should find a guide on their official page. A video tutorial is often the best way to understand the steps, like this example placeholder: [Watch Payment Guide](https://youtube.com/shorts/SjPlxb8QcfI?si=1royfsv2dw_RZvNa).";
+            } else if (text.includes("ktu") || text.includes("activity point")) {
+                return "For KTU students, earning activity points is essential. You can find the official rules and eligible activities on the KTU Student Welfare page here: [KTU Student Welfare & Activities Page](https://ktu.edu.in/eu/core/studentWelfareAndActivities.htm)";
+            } else if (text.includes("coding club") && (text.includes("link") || text.includes("website"))) {
+                return "Absolutely! The official website for the SCT Coding Club is: [SCT Coding Club](https://sctcoding.club)";
+            } else if (text.includes("tinkerhub") && (text.includes("link") || text.includes("website"))) {
+                return "You can find everything about TinkerHub at their official site: [TinkerHub Website](https://tinkerhub.org)";
+            } else if (text.includes("ieee") && (text.includes("link") || text.includes("website"))) {
+                return "The main global website for IEEE is [IEEE Official Site](https://www.ieee.org). From there, you can find resources and information about our local student branch.";
+            } else if (text.includes("csi") && (text.includes("link") || text.includes("website"))) {
+                return "The official website for the Computer Society of India (CSI) is [CSI India Website](https://www.csi-india.org).";
+            } else if (text.includes("iedc") && (text.includes("link") || text.includes("website"))) {
+                return "The IEDC program in Kerala is managed by the Kerala Startup Mission. You can find details here: [IEDC Startup Mission](https://iedc.startupmission.in)";
+            } else if (text.includes("join") && text.includes("club")) {
+                return "To join a club, simply navigate to the 'Clubs' page from the main menu, find a club that interests you, and click the 'Explore' or 'Join' button!";
+            } else if (text.includes("leave") && text.includes("club")) {
+                return "Membership rules are set by each club. For free, activity-based clubs, you might be removed after a period of inactivity. For paid clubs, your membership concludes at the end of your paid term.";
+            } else if (text.includes("find") && text.includes("club")) {
+                return "The 'Clubs' page is your central hub for discovering all the amazing communities here. You can filter and search to find the perfect one for you.";
+            } else if (text.includes("my profile") || text.includes("edit profile")) {
+                return "Your 'Profile' page shows your details and the events you've attended. On some versions, there is an 'Edit Profile' button to update your information.";
+            } else if (text.includes("announcements")) {
+                return "Announcements are official updates from club admins. You can find them in each club's dedicated 'Announcements' section.";
+            } else if (text.includes("events")) {
+                return "Upcoming events for each club are listed on their 'Upcoming Events' page. It's the best way to stay informed about workshops, meetings, and activities.";
+            } else if (text.includes("is this site free") || text.includes("cost")) {
+                return "Using the Communa website is completely free for all users! However, certain clubs like IEEE or CSI may require a separate membership fee to join.";
+            } else if (text.includes("admin")) {
+                return "Admins are the managers of each club. They are responsible for posting announcements, creating events, and managing the official member list according to the club's rules.";
+            } else if (text.includes("login") || text.includes("password")) {
+                return "If you're having trouble logging in, please try using the 'Forgot Password' link on the login page. For other issues, you may need to contact site support.";
+            }
+
+            // --- 5. General Knowledge ---
+            else if (text.includes("what is ai") || text.includes("artificial intelligence")) {
+                return "Artificial Intelligence (AI) is a branch of computer science that deals with creating machines that can think and learn like humans. I'm an example of a simple AI!";
+            } else if (text.includes("what is a database")) {
+                return "A database is an organized collection of data, stored and accessed electronically. This site uses a database, likely MySQL, to store user profiles, club details, and memberships.";
+            } else if (text.includes("why is the sky blue")) {
+                return "The sky is blue because of a phenomenon called Rayleigh scattering. The Earth's atmosphere scatters shorter-wavelength blue light from the sun more than it scatters longer-wavelength red light.";
+            } else if (text.includes("capital of india") || (text.includes("capital") && text.includes("india"))) {
+                return "The capital of India is New Delhi.";
+            } else if (text.includes("what is spring boot")) {
+                return "Spring Boot is an open-source, Java-based framework used to create microservices. It's what's likely powering the backend of this website, making it fast and robust!";
+            }
+
+            // --- 6. Club-Specific Contact Lookup ---
+            const clubContacts = {
+                "ieee": "you can contact the IEEE student chair or faculty advisor. Check the club page for specific names.",
+                "iedc": "the IEDC nodal officer is the main point of contact. Their details are on the club page.",
+                "csi": "reach out to the CSI student coordinator for any queries.",
+                "nss": "the NSS Programme Officer is in charge. Please check their contact info.",
+                "coding club": "the mentors or the president of the Coding Club can help you. Find their details on the club's page.",
+                "meckartans": "contact the Meckartans team leaders.",
+                "tinkerhub": "reach out to the TinkerHub community leads.",
+                "film": "contact the Film Club president or secretary.",
+                "velosters": "the Velosters team captain can provide information.",
+                "mulearn": "contact the µLearn campus lead or mentors.",
+                "clique": "the Clique photography club leads can be contacted via their page.",
+                "music": "the Music Club coordinators are the best point of contact.",
+                "break through science society": "contact the society's faculty advisor.",
+                "asme": "reach out to the ASME student chapter chair.",
+                "sae": "contact the SAE collegiate club faculty advisor.",
+                "cybots": "the Cybots robotics club team leads can assist you."
+            };
+
+            for (const clubName in clubContacts) {
+                if (text.includes(clubName)) {
+                    const contactInfo = clubContacts[clubName];
+                    const formattedClubName = clubName.charAt(0).toUpperCase() + clubName.slice(1);
+                    return `For questions about the ${formattedClubName}, ${contactInfo}`;
+                }
+            }
+
+            // --- 7. Final Fallback ---
+            // If no other condition is met, return a helpful default message.
+            const fallbacks = [
+                "I'm sorry, I don't have information on that. Could you try rephrasing? You can always ask for 'help'.",
+                "That's a bit outside my current knowledge. I'm best at answering questions about the clubs and features of this site.",
+                "I'm still learning about that topic. Try asking me about a specific club or a site feature like 'events' or 'profile'."
+            ];
+            return getRandom(fallbacks);
+        }
+
+        // ==================================================================
+        //  GAME HELPER FUNCTIONS
+        // ==================================================================
+
+        function startGame(gameName) {
+            currentGame = gameName;
+            if (gameName === 'guessTheNumber') {
+                guessTheNumberState = {
+                    targetNumber: Math.floor(Math.random() * 100) + 1,
+                    guesses: 0
+                };
+                return "I've thought of a number between 1 and 100. What's your first guess?";
+            }
+            if (gameName === 'rockPaperScissors') {
+                return "Rock, Paper, Scissors! Make your move.";
+            }
+            if (gameName === 'handCricket') {
+                handCricketState = {
+                    userScore: 0,
+                    botScore: 0,
+                    wickets: 1, // Hand cricket usually one wicket game
+                    isUserBatting: true
+                };
+                return "<b>You are batting first!</b><br>Enter a number from 1 to 6.";
+            }
+        }
+
+        function endGame() {
+            const gameToEnd = currentGame;
+            currentGame = null;
+            return `Okay, the game of ${gameToEnd} has ended. What would you like to do next?`;
+        }
+
+        // ==================================================================
+        //  INDIVIDUAL GAME LOGIC
+        // ==================================================================
+
+        function handleGuessTheNumber(userInput) {
+            const guess = parseInt(userInput);
+            if (isNaN(guess) || guess < 1 || guess > 100) {
+                return "That's not a valid number. Please enter a number between 1 and 100.";
+            }
+            
+            guessTheNumberState.guesses++;
+            
+            if (guess < guessTheNumberState.targetNumber) {
+                return "Too low! Try again.";
+            } else if (guess > guessTheNumberState.targetNumber) {
+                return "Too high! Try again.";
+            } else {
+                const message = `You got it! The number was ${guessTheNumberState.targetNumber}.<br>It took you ${guessTheNumberState.guesses} guesses.`;
+                endGame(); // End the game automatically on win
+                return message;
+            }
+        }
+        
+        function handleRockPaperScissors(userInput) {
+            const choices = ['rock', 'paper', 'scissors'];
+            const userChoice = userInput.toLowerCase();
+            
+            if (!choices.includes(userChoice)) {
+                return "Invalid choice. Please say rock, paper, or scissors.";
+            }
+            
+            const botChoice = choices[Math.floor(Math.random() * 3)];
+            
+            let result;
+            if (userChoice === botChoice) {
+                result = "It's a tie!";
+            } else if (
+                (userChoice === 'rock' && botChoice === 'scissors') ||
+                (userChoice === 'scissors' && botChoice === 'paper') ||
+                (userChoice === 'paper' && botChoice === 'rock')
+            ) {
+                result = "You win!";
+            } else {
+                result = "I win!";
+            }
+            
+            return `You chose <b>${userChoice}</b>. I chose <b>${botChoice}</b>.<br>${result} Play again or say 'end'.`;
+        }
+
+        function handleHandCricket(userInput) {
+            const userRun = parseInt(userInput);
+            if (isNaN(userRun) || userRun < 1 || userRun > 6) {
+                return "Invalid input. Please enter a number between 1 and 6.";
+            }
+            
+            const botRun = Math.floor(Math.random() * 6) + 1;
+            let response = `You played: <b>${userRun}</b>, I played: <b>${botRun}</b>.<br>`;
+            
+            if (handCricketState.isUserBatting) {
+                if (userRun === botRun) {
+                    response += `<b>You're OUT!</b> Your final score is ${handCricketState.userScore}.<br>My turn to bat. I need to score ${handCricketState.userScore + 1} to win.`;
+                    handCricketState.isUserBatting = false;
+                } else {
+                    handCricketState.userScore += userRun;
+                    response += `Your score is now <b>${handCricketState.userScore}</b>.`;
+                }
+            } else { // Bot is batting
+                if (userRun === botRun) {
+                    response += `<b>I'm OUT!</b> My final score is ${handCricketState.botScore}.<br>`;
+                    if (handCricketState.botScore > handCricketState.userScore) {
+                        response += "<b>I win the match!</b>";
+                    } else if (handCricketState.userScore > handCricketState.botScore) {
+                        response += "<b>You win the match!</b>";
+                    } else {
+                        response += "<b>It's a tie!</b>";
+                    }
+                    return endGame() + "<br>" + response; // End game and return final message
+                } else {
+                    handCricketState.botScore += botRun;
+                    response += `My score is now <b>${handCricketState.botScore}</b>.`;
+                    if (handCricketState.botScore > handCricketState.userScore) {
+                        response += "<br><b>I've chased the score. I win the match!</b>";
+                        return endGame() + "<br>" + response; // End game and return final message
+                    }
+                }
+            }
+            return response;
+        }
+
+    </script>
+    <script src="scripts.js"></script> </body>
+</html>

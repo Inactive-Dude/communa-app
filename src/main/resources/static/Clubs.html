@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Clubs</title> <link rel="icon" type="image/png" href="Favicon.png">
+
+  <link rel="stylesheet" href="styles.css" />
+  <script src="auth.js" defer></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+    /* --- Base Styles --- */
+    body {
+      margin: 0;
+      font-family: 'inter', sans-serif;
+      background-color: #0d0d0d;
+      color: #fff;
+      -webkit-text-stroke: 0.75px black;
+      paint-order: stroke fill;
+    }
+
+    /* --- Fluid Background --- */
+    #fluid-canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+    }
+
+    .content-wrapper {
+        position: relative;
+        z-index: 2;
+    }
+
+    /* --- Keyframe Animation for Header --- */
+    @keyframes slideDownFadeIn {
+      from {
+        transform: translateY(-100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    /* --- CORRECTED Header Styles --- */
+    header {
+      position: absolute;
+      top: 20px;
+      left: 2%;
+      transform: translateX(-50%);
+      width: 95%;
+      max-width: 1600px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 30px;
+      box-sizing: border-box;
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 50px;
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+      animation: slideDownFadeIn 1s ease-out forwards;
+    }
+
+   .logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: #ffffff;
+    padding: 0;
+}
+
+nav a {
+    margin: 0 15px;
+    text-decoration: none;
+    color: #bfbfbf;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+    nav a:hover {
+      color: #ffffff;
+    }
+
+    .club-title {
+      text-align: center;
+      padding-top: 150px;
+      margin-bottom: 30px;
+      font-size: 48px;
+      font-weight: bold;
+      color: #ffffff;
+    }
+
+    /* --- Liquid Glass Club Card Style --- */
+    .club-card {
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      transition: transform 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+    }
+
+    .club-card:hover {
+      transform: translateY(-5px);
+      border-color: rgba(255, 255, 255, 0.3);
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .club-card h2 {
+      color: #ffffff;
+      margin-bottom: 0.75rem;
+    }
+
+    .club-card h2 a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .club-card p {
+      flex-grow: 1;
+      color: #bfbfbf;
+      margin-bottom: 1.5rem;
+    }
+
+    .clubs {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+      padding: 2rem 40px;
+    }
+    
+    /* --- Button Styles Update --- */
+    .join-btn {
+      background: transparent;
+      color: #ffffff;
+      border: 2px solid #ffffff;
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      margin-left: 10px;
+      text-decoration: none;
+      -webkit-text-stroke: 0; /* Removes stroke from Explore button */
+    }
+
+    .join-btn:hover {
+      background: #ffffff;
+      color: black;
+    }
+
+    .logout-btn {
+        -webkit-text-stroke: 0; /* Removes stroke from Logout button */
+    }
+</style>
+</head>
+
+<body>
+  <canvas id="fluid-canvas"></canvas>
+
+  <div class="content-wrapper">
+    <header>
+      <div class="logo">Communa</div>
+      <nav>
+        <a href="newpage.html">Home</a>
+        <a href="Clubs.html">Clubs</a>
+        <a href="AboutUs.html">About Us</a>
+        <a href="Profile.html">Profile</a>
+        <a href="Help.html">Help</a>
+        <button onclick="logout()" class="nav-button logout-btn">Logout</button>
+      </nav>
+    </header>
+
+    <h1 class="club-title">Clubs present in college</h1>
+    
+    <section class="clubs">
+        <div class="club-card"><h2><a href="IEEE.html">IEEE</a></h2><p>Short description about the club</p><a href="IEEE.html" class="join-btn">Explore</a></div>
+        <div class="club-card"><h2><a href="IEDC.html">IEDC</a></h2><p>Short description about the club</p><a href="IEDC.html" class="join-btn">Explore</a></div>
+        <div class="club-card"><h2><a href="CSI.html">CSI</a></h2><p>Short description about the club</p><a href="CSI.html" class="join-btn">Explore</a></div>
+        <div class="club-card"><h2><a href="NSS.html">NSS</a></h2><p>Short description about the club</p><a href="NSS.html" class="join-btn">Explore</a></div>
+        <div class="club-card"><h2><a href="Coding Club.html">Coding Club</a></h2><p>Short description about the club</p><a href="Coding Club.html" class="join-btn">Explore</a></div>
+        <div class="club-card"><h2><a href="Meckartans.html">Meckartans</a></h2><p>Short description about the club</p><a href="Meckartans.html" class="join-btn">Explore</a></div>
+        <div class="club-card"><h2><a href="Tinker Hub.html">Tinker Hub</a></h2><p>Short description about the club</p><a href="Tinker Hub.html" class="join-btn">Explore</a></div>
+        <div class="club-card"><h2><a href="Film Club.html">Film Club</a></h2><p>Short description about the club</p><a href="Film Club.html" class="join-btn">Explore</a></div>
+        <div class="club-card"><h2><a href="Velosters.html">Velosters</a></h2><p>Short description about the club</p><a href="Velosters.html" class="join-btn">Explore</a></div>
+        <div class="club-card"><h2><a href="Mulearn.html">Mulearn</a></h2><p>Short description about the club</p><a href="Mulearn.html" class="join-btn">Explore</a></div>
+        <div class="club-card"><h2><a href="Clique.html">Clique</a></h2><p>Short description about the club</p><a href="Clique.html" class="join-btn">Explore</a></div>
+        <div class="club-card"><h2><a href="Music Club.html">Music Club</a></h2><p>Short description about the club</p><a href="Music Club.html" class="join-btn">Explore</a></div>
+        <div class="club-card"><h2><a href="Break through science society.html">Break through science society</a></h2><p>Short description about the club</p><a href="Break through science society.html" class="join-btn">Explore</a></div>
+        <div class="club-card"><h2><a href="ASME.html">ASME</a></h2><p>Short description about the club</p><a href="ASME.html" class="join-btn">Explore</a></div>
+        <div class="club-card"><h2><a href="SAE.html">SAE</a></h2><p>Short description about the club</p><a href="SAE.html" class="join-btn">Explore</a></div>
+        <div class="club-card"><h2><a href="Cybota.html">Cybots</a></h2><p>Short description about the club</p><a href="Cybota.html" class="join-btn">Explore</a></div>
+    </section>
+  </div>
+  
+  <script src="scripts.js" defer></script>
+  <script>
+  function logout() {
+    // This function will redirect the user to the login page
+    alert("You have been logged out.");
+    window.location.href = "index.html"; // Redirects to your main login page
+  }
+</script>
+</body>
+</html>

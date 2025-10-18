@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Communa | Profile</title> 
+  <link rel="icon" type="image/png" href="Favicon.png">
+  <link rel="stylesheet" href="styles.css" />
+  <script src="auth.js" defer></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="auth.js" defer></script>
+  
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background-color: #0d0d0d;
+      color: #fff;
+    }
+
+    /* --- Fluid Background --- */
+    #fluid-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+
+    .content-wrapper {
+      position: relative;
+      z-index: 2;
+    }
+    
+    /* --- Keyframe Animation for Header --- */
+    @keyframes slideDownFadeIn {
+      from { transform: translateY(-100%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    /* --- Glass Ribbon Header --- */
+    header {
+      position: fixed;
+      top: 20px;
+      left: 2%;
+      transform: translateX(-50%);
+      width: 95%;
+      max-width: 1600px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      z-index: 100;
+
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 50px;
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+      animation: slideDownFadeIn 1s ease-out forwards;
+    }
+
+    .logo { font-size: 24px; font-weight: bold; color: #ffffff; }
+    nav a {
+      margin: 0 15px;
+      text-decoration: none;
+      color: #bfbfbf;
+      font-weight: 500;
+      transition: color 0.3s ease;
+    }
+    nav a:hover { color: #ffffff; }
+
+    /* --- Main Content Padding --- */
+    main { padding-top: 150px; }
+    
+    /* --- Profile Card --- */
+    .profile-container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 40px;
+      border-radius: 16px;
+
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .profile-heading { font-size: 32px; font-weight: bold; text-align: center; margin-bottom: 30px; }
+    .profile-info { font-size: 18px; line-height: 2; color: #d9d9d9; }
+    .profile-info strong { color: #ffffff; }
+    #enrolled-clubs a { color: #ffffff; text-decoration: none; font-weight: bold; }
+    #enrolled-clubs a:hover { text-decoration: underline; }
+
+    /* --- Edit button matching nav color scheme --- */
+    .edit-btn {
+      margin-top: 30px;
+      display: block;
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      background-color: rgba(255, 255, 255, 0.1); /* same as nav glass effect */
+      color: #ffd700; /* matching the gold highlight */
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .edit-btn:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="fluid-canvas"></canvas>
+  <div class="content-wrapper">
+    <header>
+      <div class="logo">Communa</div>
+      <nav>
+        <a href="newpage.html">Home</a>
+        <a href="Clubs.html">Clubs</a>
+        <a href="AboutUs.html">About Us</a>
+        <a href="Profile.html">Profile</a>
+        <a href="Help.html">Help</a>
+        <button onclick="logout()" class="nav-button logout-btn">Logout</button>
+      </nav>
+    </header>
+
+    <main>
+      <div class="profile-container">
+        <h1 class="profile-heading">Your Profile</h1>
+        <div class="profile-info" id="profile-info">
+          <!-- Dynamic user info will be injected here -->
+        </div>
+        <button class="edit-btn">Edit Profile</button>
+      </div>
+    </main>
+  </div>
+  
+  <script src="auth.js"></script>
+
+  <script>
+    // Fetch user data from localStorage
+    const user = JSON.parse(localStorage.getItem("user"));
+    const profileInfo = document.getElementById("profile-info");
+
+    if (user) {
+      profileInfo.innerHTML = `
+        <p><strong>Name:</strong> ${user.name}</p>
+        <p><strong>Email:</strong> ${user.email}</p>
+        <p><strong>College ID:</strong> ${user.admissionNumber || "Not provided"}</p>
+        <p><strong>Branch:</strong> ${user.branch || "Not provided"}</p>
+        <p><strong>Enrolled Clubs:</strong> <span id="enrolled-clubs"></span></p>
+      `;
+    } else {
+      profileInfo.innerHTML = "<p>Please log in first.</p>";
+    }
+
+    // Club logic
+    const enrolledClubs = [];
+    const allClubs = ["IEEE", "IEDC", "CSI", "NSS", "Coding Club", "Meckartans", "TinkerHub", "Film Club","Velosters","Mulearn","Clique","Music Club","Break through science society","SAE","Cybots"];
+
+    allClubs.forEach(club => {
+      if (localStorage.getItem(club) === "joined") {
+        enrolledClubs.push(club);
+      }
+    });
+
+    const enrolledClubsContainer = document.getElementById("enrolled-clubs");
+    if (enrolledClubs.length > 0) {
+      enrolledClubsContainer.innerHTML = enrolledClubs
+        .map(club => `<a href="${club}.html">${club}</a>`)
+        .join(", ");
+    } else {
+      enrolledClubsContainer.textContent = "No clubs joined yet";
+    }
+
+    // Logout function
+    function logout() {
+      localStorage.removeItem("user");
+      sessionStorage.clear();
+      alert("You have been logged out.");
+      window.location.href = "index.html";
+    }
+  </script>
+  <script src="scripts.js"></script>
+</body>
+</html>

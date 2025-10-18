@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>About Us</title> <link rel="icon" type="image/png" href="Favicon.png"> 
+  <link rel="stylesheet" href="styles.css" /><script src="auth.js" defer></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    /* --- Base Styles --- */
+    body {
+      margin: 0;
+      font-family: 'inter', sans-serif;
+      background-color: #0d0d0d;
+      color: #fff;
+    }
+
+    /* --- Fluid Background Canvas --- */
+    #fluid-canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+    }
+
+    .content-wrapper {
+        position: relative;
+        z-index: 2;
+    }
+
+    /* --- Keyframe Animation for Header --- */
+    @keyframes slideDownFadeIn {
+      from {
+        transform: translate(-50%, -150%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(-50%);
+        opacity: 1;
+      }
+    }
+
+    /* --- Liquid Glass Header --- */
+    header {
+      /* Positioning */
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+
+      /* Layout & Sizing */
+      width: 95%;
+      max-width: 1600px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 30px;
+      box-sizing: border-box;
+
+      /* The Glass Effect */
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 50px;
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+
+      /* Animation */
+      animation: slideDownFadeIn 1s ease-out forwards;
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: bold;
+      color: #ffffff;
+    }
+
+    nav a {
+      margin: 0 15px;
+      text-decoration: none;
+      color: #bfbfbf;
+      font-weight: 500;
+      transition: color 0.3s ease;
+    }
+
+    nav a:hover {
+      color: #ffffff;
+    }
+
+    /* --- Page Content Layout --- */
+    .club-title {
+      text-align: center;
+      padding-top: 150px; /* IMPORTANT: This pushes the title down below the floating header */
+      margin-bottom: 30px;
+      font-size: 48px;
+      font-weight: bold;
+      color: #ffffff;
+    }
+
+    .content {
+      margin-top: 30px;
+      text-align: center;
+      color: #bfbfbf;
+      font-size: 20px;
+      padding: 0 40px;
+    }
+
+    .glass-panel {
+      padding: 30px;
+      position: sticky;
+      top: 50px;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Canvas for the fluid background effect -->
+  <canvas id="fluid-canvas"></canvas>
+
+   
+  <div class="content-wrapper">
+    <!-- Header with logo and navigation links -->
+    <header>
+      <div class="logo">Communa</div>
+      <nav>
+        <a href="newpage.html">Home</a>
+        <a href="Clubs.html">Clubs</a>
+        <a href="AboutUs.html">About Us</a>
+        <a href="Profile.html">Profile</a>
+        <a href="Help.html">Help</a>
+        <button onclick="logout()" class="nav-button logout-btn">Logout</button>
+      </nav>
+    </header>
+
+     <aside class="glass-panel">
+    <h1 class="club-title">About Us</h1>
+
+    <div class="content">
+      <p>Welcome to Communa, the central hub for all college club activities.</p> <br> <br>
+      <p>We are Group 1, a collaborative team of student developers brought together by a shared passion for the principles of Object-Oriented Programming. Our primary mission for this project was to design and construct a robust application from the ground up, translating OOP theory into tangible, real-world practice. <br> <br>
+
+Guided by the core pillars of OOP, we collectively engineered our system to be modular, scalable, and maintainable. We focused on leveraging Encapsulation to ensure data integrity, Inheritance to promote code reuse, and Polymorphism to build flexible and dynamic functionalities. Every aspect of this project, from the initial architecture to the final implementation, was a product of our shared effort and dedication. <br> <br>
+
+This project was brought to life by the combined contributions of Aaron A George, Aditya Manojkumar, and Anantha Krishnan A R. We are proud to present a final product that reflects our deep appreciation for elegant and effective software design.</p>
+    </div>
+    </aside>
+  </div>
+
+  <!-- This script enables the fluid background -->
+  <script src="scripts.js" defer></script>
+  <script>
+  function logout() {
+    // This function will redirect the user to the login page
+    alert("You have been logged out.");
+    window.location.href = "index.html"; // Redirects to your main login page
+  }
+</script>
+</body>
+</html>

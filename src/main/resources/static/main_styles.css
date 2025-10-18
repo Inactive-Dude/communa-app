@@ -1,0 +1,131 @@
+/* --- UNIVERSAL STYLES FOR ALL INTERNAL PAGES --- */
+
+/* --- Base Styles --- */
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background-color: #0d0d0d;
+  color: #fff;
+  text-shadow: 1px 1px 0 #691F15, -1px -1px 0 #691F15, 1px -1px 0 #691F15, -1px 1px 0 #691F15, 1px 0 0 #691F15, -1px 0 0 #691F15, 0 1px 0 #691F15, 0 -1px 0 #691F15;
+  -webkit-text-stroke: 0.75px black;
+  paint-order: stroke fill;
+}
+
+/* --- Fluid Background Canvas --- */
+#fluid-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
+
+.content-wrapper {
+  position: relative;
+  z-index: 2;
+}
+
+/* --- Header Animation --- */
+@keyframes slideDownFadeIn {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* --- Main Header Styling (RIGHT-ALIGNED NAVIGATION) --- */
+header {
+  position: fixed;
+  top: 20px;
+  left: 0.5%;
+  transform: translateX(-50%);
+  width: 95%;
+  max-width: 1600px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 30px;
+  z-index: 100;
+  border-radius: 50px;
+  animation: slideDownFadeIn 1s ease-out forwards;
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: 700;
+  color: #fff;
+}
+
+nav a {
+  margin: 0 15px;
+  text-decoration: none;
+  color: #bfbfbf;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+nav a:hover {
+  color: #fff;
+}
+
+/* --- Logout Button --- */
+.logout-btn {
+  background: transparent;
+  border: 1px solid #ffffff;
+  color: #ffffff;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-left: 15px;
+  transition: background-color 0.3s ease;
+}
+
+.logout-btn:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* --- Page Content Layout --- */
+.club-title, .help-title, .profile-heading {
+  text-align: center;
+  padding-top: 150px;
+  font-size: 48px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.content {
+  margin-top: 30px;
+  text-align: center;
+  color: #bfbfbf;
+  font-size: 20px;
+}
+
+/* --- DEEP ORANGE ETHER THEME (POWERED BY JAVASCRIPT) --- */
+
+/* This is the non-tinted frosted glass background. */
+.frosted-glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  position: relative;
+  overflow: hidden; /* This is crucial to contain the canvas */
+}
+
+/* This styles the new canvas to fill the header */
+#header-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1; /* Place it behind the nav links */
+}
