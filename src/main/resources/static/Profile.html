@@ -6,12 +6,11 @@
   <title>Communa | Profile</title> 
   <link rel="icon" type="image/png" href="Favicon.png">
   <link rel="stylesheet" href="styles.css" />
-  <script src="auth.js" defer></script>
+   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-  <script src="auth.js" defer></script>
-  
+   
   <style>
     body {
       margin: 0;
@@ -37,22 +36,22 @@
     
     /* --- Keyframe Animation for Header --- */
     @keyframes slideDownFadeIn {
-      from { transform: translateY(-100%); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
+      from { transform: translate(-50%, -150%); opacity: 0; }
+      to { transform: translateX(-50%); opacity: 1; }
     }
 
     /* --- Glass Ribbon Header --- */
     header {
       position: fixed;
       top: 20px;
-      left: 2%;
+      left: 50%;
       transform: translateX(-50%);
       width: 95%;
       max-width: 1600px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 10px 20px;
+      padding: 10px 30px;
       z-index: 100;
 
       background: rgba(255, 255, 255, 0.1);
@@ -65,21 +64,25 @@
     }
 
     .logo { font-size: 24px; font-weight: bold; color: #ffffff; }
+
+    /* ---- Centered nav removed for symmetry ---- */
+    /* logout button sits at the right edge natively with justify-content: space-between */
     nav a {
       margin: 0 15px;
       text-decoration: none;
       color: #bfbfbf;
       font-weight: 500;
       transition: color 0.3s ease;
+      white-space: nowrap;
     }
     nav a:hover { color: #ffffff; }
 
     /* --- Main Content Padding --- */
-    main { padding-top: 150px; }
+    main { padding-top: 130px; padding-bottom: 60px; }
     
     /* --- Profile Card --- */
     .profile-container {
-      max-width: 600px;
+      max-width: 640px;
       margin: 0 auto;
       padding: 40px;
       border-radius: 16px;
@@ -91,30 +94,123 @@
     }
     
     .profile-heading { font-size: 32px; font-weight: bold; text-align: center; margin-bottom: 30px; }
-    .profile-info { font-size: 18px; line-height: 2; color: #d9d9d9; }
+    .profile-info { font-size: 16px; line-height: 2.2; color: #d9d9d9; }
     .profile-info strong { color: #ffffff; }
     #enrolled-clubs a { color: #ffffff; text-decoration: none; font-weight: bold; }
     #enrolled-clubs a:hover { text-decoration: underline; }
 
-    /* --- Edit button matching nav color scheme --- */
+    /* --- Section divider --- */
+    .section-divider {
+      border: none;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      margin: 28px 0;
+    }
+
+    .first-login-banner {
+      background: rgba(255, 215, 0, 0.08);
+      border: 1px solid rgba(255, 215, 0, 0.3);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      color: #ffd700;
+      font-size: 14px;
+      text-align: center;
+    }
+
+    .profile-form {
+      margin-top: 8px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .profile-form label {
+      display: grid;
+      gap: 8px;
+      color: #ffffff;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .profile-form input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 12px 14px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+      font: inherit;
+      font-size: 14px;
+      -webkit-text-stroke: 0;
+    }
+
+    .profile-form input:focus {
+      outline: 2px solid rgba(255, 215, 0, 0.45);
+      border-color: rgba(255, 215, 0, 0.75);
+    }
+
+    .profile-form input::placeholder {
+      color: rgba(255, 255, 255, 0.45);
+    }
+
+    .form-message {
+      min-height: 24px;
+      color: #ffd700;
+      font-size: 14px;
+    }
+
+    /* --- Save button --- */
     .edit-btn {
-      margin-top: 30px;
+      margin-top: 8px;
       display: block;
       width: 100%;
       padding: 12px;
       font-size: 16px;
-      background-color: rgba(255, 255, 255, 0.1); /* same as nav glass effect */
-      color: #ffd700; /* matching the gold highlight */
-      border: 1px solid rgba(255, 255, 255, 0.3);
+      font-family: 'Poppins', sans-serif;
+      background-color: rgba(255, 215, 0, 0.12);
+      color: #ffd700;
+      border: 1px solid rgba(255, 215, 0, 0.4);
       border-radius: 8px;
       cursor: pointer;
       transition: background 0.3s, color 0.3s;
     }
 
     .edit-btn:hover {
-      background-color: rgba(255, 255, 255, 0.2);
+      background-color: rgba(255, 215, 0, 0.25);
       color: #ffffff;
     }
+
+    /* Nav logout button */
+    .logout-btn {
+      background: transparent;
+      border: 1px solid #ffffff;
+      color: #ffffff;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.9rem;
+      cursor: pointer;
+      margin-left: 15px;
+      transition: background-color 0.3s ease;
+    }
+
+    .logout-btn:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Live-preview hint below register number input */
+    .reg-preview {
+      margin-top: 6px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      font-size: 13px;
+      color: #bfbfbf;
+      line-height: 1.8;
+      display: none;  /* shown by JS when valid */
+    }
+    .reg-preview span { color: #ffd700; font-weight: 600; }
   </style>
 </head>
 <body>
@@ -128,65 +224,271 @@
         <a href="AboutUs.html">About Us</a>
         <a href="Profile.html">Profile</a>
         <a href="Help.html">Help</a>
-        <button onclick="logout()" class="nav-button logout-btn">Logout</button>
+        <button onclick="logout()" class="logout-btn">Logout</button>
       </nav>
     </header>
 
     <main>
       <div class="profile-container">
         <h1 class="profile-heading">Your Profile</h1>
+
+        <!-- Profile info (always shown) -->
         <div class="profile-info" id="profile-info">
-          <!-- Dynamic user info will be injected here -->
+          <p>Loading profile…</p>
         </div>
-        <button class="edit-btn">Edit Profile</button>
+
+        <hr class="section-divider">
+
+        <!-- First-login form — only shown when admission number is empty -->
+        <div id="first-login-section" style="display:none;">
+          <div class="first-login-banner">
+            👋 Welcome! Please complete your profile to get started. You only need to do this once.
+          </div>
+          <form class="profile-form" id="profile-form">
+            <label>
+              Admission Number
+              <input type="text" id="admissionNumber" name="admissionNumber"
+                     placeholder="e.g. 2023CS001" required />
+            </label>
+            <label>
+              University Register Number
+              <input
+                type="text"
+                id="universityRegisterNumber"
+                name="universityRegisterNumber"
+                required
+                maxlength="10"
+                placeholder="SCT24CS002"
+              />
+            </label>
+            <!-- Live preview of what we extract from the register number -->
+            <div class="reg-preview" id="reg-preview"></div>
+
+            <div class="form-message" id="profile-message"></div>
+            <button class="edit-btn" type="submit">Save Profile</button>
+          </form>
+        </div>
+
       </div>
     </main>
   </div>
   
+  <script src="auth-helper.js"></script>
   <script src="auth.js"></script>
 
   <script>
-    // Fetch user data from localStorage
-    const user = JSON.parse(localStorage.getItem("user"));
-    const profileInfo = document.getElementById("profile-info");
+    /* ===== Department & College code maps (mirrors backend) ===== */
+    const DEPT_MAP = {
+      CS: "Computer Science", IT: "Information Technology",
+      EC: "Electronics & Communication", EE: "Electrical Engineering",
+      ME: "Mechanical Engineering", CE: "Civil Engineering",
+      CH: "Chemical Engineering", BT: "Biotechnology",
+      AI: "Artificial Intelligence", AD: "AI & Data Science",
+      CY: "Cyber Security", RA: "Robotics & Automation"
+    };
+    const COLLEGE_MAP = {
+      SCT: "Sree Chitra Thirunal College of Engineering"
+    };
 
-    if (user) {
+    /**
+     * Parse a university register number like SCT24CS002 into its parts.
+     * Returns null if the format is invalid.
+     */
+    function parseRegNumber(raw) {
+      if (!raw) return null;
+      const s = raw.trim().toUpperCase();
+      const m = s.match(/^([A-Z]{3})(\d{2})([A-Z]{2})(\d{3})$/);
+      if (!m) return null;
+      return {
+        collegeCode: m[1],
+        collegeName: COLLEGE_MAP[m[1]] || m[1],
+        year: "20" + m[2],
+        deptCode: m[3],
+        department: DEPT_MAP[m[3]] || m[3],
+        rollNumber: m[4]
+      };
+    }
+
+    /* ===== DOM Refs ===== */
+    const profileInfo         = document.getElementById("profile-info");
+    const firstLoginSection   = document.getElementById("first-login-section");
+    const profileForm         = document.getElementById("profile-form");
+    const profileMessage      = document.getElementById("profile-message");
+    const regInput            = document.getElementById("universityRegisterNumber");
+    const regPreview          = document.getElementById("reg-preview");
+
+    /* ===== Helpers ===== */
+    function escapeHtml(v) {
+      return String(v ?? "")
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+    function parseJson(v) { try { return v ? JSON.parse(v) : null; } catch { return null; } }
+
+    let user = (typeof getUserData === "function" ? getUserData() : null)
+      || parseJson(sessionStorage.getItem("userData"))
+      || parseJson(localStorage.getItem("user"));
+
+    function profileIsComplete(u) {
+      return u && u.admissionNumber && u.admissionNumber.trim() !== "";
+    }
+
+    /* ===== Render profile info ===== */
+    function renderProfile(currentUser) {
+      if (!profileInfo) return;
+      if (!currentUser) { profileInfo.innerHTML = "<p>Loading profile…</p>"; return; }
+
+      const complete = profileIsComplete(currentUser);
+
+      // Try to parse extra info from the register number
+      const parsed = parseRegNumber(currentUser.universityRegisterNumber);
+
+      // Use server-side values first, fall back to parsed
+      const college = currentUser.collegeName || (parsed ? parsed.collegeName : "—");
+      const dept    = currentUser.department  || (parsed ? parsed.department  : "—");
+      const branch  = currentUser.branch      || (parsed ? parsed.department  : "—");
+      const year    = parsed ? parsed.year : "—";
+
       profileInfo.innerHTML = `
-        <p><strong>Name:</strong> ${user.name}</p>
-        <p><strong>Email:</strong> ${user.email}</p>
-        <p><strong>College ID:</strong> ${user.admissionNumber || "Not provided"}</p>
-        <p><strong>Branch:</strong> ${user.branch || "Not provided"}</p>
+        <p><strong>Name:</strong> ${escapeHtml(currentUser.name || "Not provided")}</p>
+        <p><strong>Email:</strong> ${escapeHtml(currentUser.email || "Not provided")}</p>
+        ${complete ? `
+        <p><strong>College:</strong> ${escapeHtml(college)}</p>
+        <p><strong>Department:</strong> ${escapeHtml(dept)}</p>
+        <p><strong>Year of Admission:</strong> ${escapeHtml(year)}</p>
+        <p><strong>Admission No.:</strong> ${escapeHtml(currentUser.admissionNumber)}</p>
+        <p><strong>University Reg. No.:</strong> ${escapeHtml(currentUser.universityRegisterNumber)}</p>
+        ` : ""}
         <p><strong>Enrolled Clubs:</strong> <span id="enrolled-clubs"></span></p>
       `;
-    } else {
-      profileInfo.innerHTML = "<p>Please log in first.</p>";
-    }
 
-    // Club logic
-    const enrolledClubs = [];
-    const allClubs = ["IEEE", "IEDC", "CSI", "NSS", "Coding Club", "Meckartans", "TinkerHub", "Film Club","Velosters","Mulearn","Clique","Music Club","Break through science society","SAE","Cybots"];
-
-    allClubs.forEach(club => {
-      if (localStorage.getItem(club) === "joined") {
-        enrolledClubs.push(club);
+      // Show or hide first-login form
+      if (firstLoginSection) {
+        firstLoginSection.style.display = complete ? "none" : "block";
       }
-    });
 
-    const enrolledClubsContainer = document.getElementById("enrolled-clubs");
-    if (enrolledClubs.length > 0) {
-      enrolledClubsContainer.innerHTML = enrolledClubs
-        .map(club => `<a href="${club}.html">${club}</a>`)
-        .join(", ");
-    } else {
-      enrolledClubsContainer.textContent = "No clubs joined yet";
+      renderEnrolledClubs();
     }
 
-    // Logout function
+    /* ===== Live preview while typing register number ===== */
+    if (regInput && regPreview) {
+      regInput.addEventListener("input", () => {
+        const parsed = parseRegNumber(regInput.value);
+        if (parsed) {
+          regPreview.style.display = "block";
+          regPreview.innerHTML = `
+            <strong>Detected:</strong><br>
+            College: <span>${escapeHtml(parsed.collegeName)}</span> &nbsp;|&nbsp;
+            Department: <span>${escapeHtml(parsed.department)}</span> &nbsp;|&nbsp;
+            Year: <span>${escapeHtml(parsed.year)}</span> &nbsp;|&nbsp;
+            Roll: <span>${escapeHtml(parsed.rollNumber)}</span>
+          `;
+        } else {
+          regPreview.style.display = "none";
+        }
+      });
+    }
+
+    /* ===== Initial render ===== */
+    renderProfile(user);
+
+    /* ===== Server fetch ===== */
+    async function loadProfileFromServer() {
+      if (typeof getAuthToken === "function" && !getAuthToken()) {
+        if (profileInfo) profileInfo.innerHTML = "<p>Please log in first.</p>";
+        return;
+      }
+      try {
+        const response = await fetch("/profile", {
+          method: "GET",
+          headers: typeof getAuthHeaders === "function" ? getAuthHeaders() : {}
+        });
+        const data = await response.json();
+        if (!response.ok) {
+          if (profileInfo) profileInfo.innerHTML = `<p>${escapeHtml(data.error || "Could not load profile.")}</p>`;
+          return;
+        }
+        user = { ...(user || {}), ...data };
+        if (typeof setUserData === "function") setUserData(user);
+        renderProfile(user);
+      } catch (error) {
+        console.error("Profile load failed:", error);
+        if (profileInfo) profileInfo.innerHTML = "<p>Unable to connect to the server.</p>";
+      }
+    }
+
+    /* ===== Form submit ===== */
+    if (profileForm && profileMessage) {
+      profileForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const admissionNumber = (document.getElementById("admissionNumber").value || "").trim();
+        const universityRegisterNumber = (regInput.value || "").trim().toUpperCase();
+
+        // Client-side validation
+        const parsed = parseRegNumber(universityRegisterNumber);
+        if (!parsed) {
+          profileMessage.textContent = "Register number must look like SCT24CS002 (3-letter college + 2-digit year + 2-letter dept + 3-digit roll).";
+          return;
+        }
+
+        profileMessage.textContent = "Saving…";
+
+        try {
+          const response = await fetch("/profile", {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              ...(typeof getAuthHeaders === "function" ? getAuthHeaders() : {})
+            },
+            body: JSON.stringify({ admissionNumber, universityRegisterNumber })
+          });
+
+          const data = await response.json();
+          if (!response.ok) {
+            profileMessage.textContent = data.error || "Could not save profile.";
+            return;
+          }
+
+          user = { ...(user || {}), ...data };
+          if (typeof setUserData === "function") setUserData(user);
+          profileMessage.textContent = "✅ Profile saved successfully!";
+          renderProfile(user);
+        } catch (error) {
+          console.error("Profile update failed:", error);
+          profileMessage.textContent = "Unable to connect to the server.";
+        }
+      });
+    }
+
+    /* ===== Club logic ===== */
+    const clubPages = {
+      "IEEE": "IEEE.html", "IEDC": "IEDC.html", "CSI": "CSI.html",
+      "NSS": "NSS.html", "Coding Club": "Coding Club.html",
+      "Meckartans": "Meckartans.html", "Tinker Hub": "Tinker Hub.html",
+      "Film Club": "Film Club.html", "Velosters": "Velosters.html",
+      "Mulearn": "Mulearn.html", "Clique": "Clique.html",
+      "Music Club": "Music Club.html",
+      "Break through science society": "Break through science society.html"
+    };
+
+    function renderEnrolledClubs() {
+      const enrolled = Object.keys(clubPages).filter(c => localStorage.getItem(c) === "joined");
+      const container = document.getElementById("enrolled-clubs");
+      if (!container) return;
+      container.innerHTML = enrolled.length > 0
+        ? enrolled.map(c => `<a href="${clubPages[c]}">${escapeHtml(c)}</a>`).join(", ")
+        : "No clubs joined yet";
+    }
+
+    loadProfileFromServer();
+
+    /* ===== Logout ===== */
     function logout() {
-      localStorage.removeItem("user");
-      sessionStorage.clear();
+      if (typeof removeAuthToken === "function") removeAuthToken();
+      if (typeof clearUserData === "function") clearUserData();
       alert("You have been logged out.");
-      window.location.href = "index.html";
+      window.location.replace("index.html");
     }
   </script>
   <script src="scripts.js"></script>

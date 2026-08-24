@@ -12,8 +12,7 @@ body {
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;
-  -webkit-text-stroke: 0.75px black;
-  paint-order: stroke fill;
+
 }
 /* --- Main Content Wrapper --- */
 .content-wrapper {
@@ -26,37 +25,9 @@ body {
 }
 
 /* --- Header & Navigation --- */
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 2rem 0;
-  width: 100%;
-}
+/* Header, .logo, nav a styles are defined inline on each page */
 
-.logo {
-  font-weight: 700;
-  font-size: 1.8rem;
-  color: #ffffff;
-}
 
-nav a {
-  margin-left: 2rem;
-  text-decoration: none;
-  color: #fff;
-  font-weight: 600;
-  transition: color 0.3s ease;
-}
-
-nav a:hover {
-  color: #ffffff;
-}
-
-/* NEW RULE FOR ACTIVE LINK */
-nav a.active {
-  color: #ffffff;
-  font-weight: 700;
-}
 
 /* --- Main Content & Hero Section --- */
 main {
@@ -194,13 +165,7 @@ footer h3 {
 /* --- Global Styles & Font Import --- */
 /* ... your existing styles ... */
 
-/* --- Header & Navigation --- */
-header {
-  /* ... your existing header styles ... */
-  /* We add a transition for a smooth fade-in later */
-  opacity: 0;
-  transition: opacity 0.5s ease;
-}
+/* Header opacity handled inline on each page */
 
 /* Initially hide the original header logo */
 #header-logo {
@@ -253,69 +218,21 @@ header {
     visibility: hidden;
 }
 
-/* Add this to styles.css */
-.logout-btn {
-  background: transparent;
-  border: 1px solid #ffffff;
-  color: #ffffff;
-  padding: 8px 16px;
-  border-radius: 6px;
-  font-family: 'Poppins', sans-serif;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  margin-left: 1rem;
-  transition: background-color 0.3s ease;
-}
+/* logout-btn styles are defined inline on each page */
 
-.logout-btn:hover {
-  background-color: rgba(255, 255, 255, 0.2);
-}
+/* Header styles are defined inline on each page */
 
-/* --- Styles for the Header --- */
-header {
-  position: fixed; /* Makes the header stay at the top */
-  top: 20px;
-  left: 50%; /* Center the header */
-  transform: translateX(-50%);
-  width: 95%;
-  max-width: 1600px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 20px;
-  z-index: 100;
 
-  /* Liquid Glass Effect */
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 50px;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-}
-
-/* --- Style for the Logout Button --- */
-.logout-btn {
-  background: transparent;
-  border: 1px solid #ffffff;
-  color: #ffffff;
-  padding: 8px 16px;
-  border-radius: 6px;
-  font-family: 'Poppins', sans-serif;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  margin-left: 15px; /* Space before logout button */
-  transition: background-color 0.3s ease;
-}
-
-.logout-btn:hover {
-  background-color: rgba(255, 255, 255, 0.2);
-}
 
 /* --- Padding for Main Content --- */
 /* IMPORTANT: This stops content from being hidden under the fixed header */
 main {
   padding-top: 120px;
 }
+
+/* Nav positioning is defined inline on each page */
+
+/* Ensure form / select elements inside .content-wrapper are clickable */
+.content-wrapper select {
+  pointer-events: auto;
+}

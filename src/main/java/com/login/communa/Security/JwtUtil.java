@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.Claims;
@@ -14,19 +15,30 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 
+import jakarta.annotation.PostConstruct;
+
 @Component
 public class JwtUtil {
 
-    // ✅ SECURITY FIX: Use a static, secure secret key.
-    // This prevents tokens from becoming invalid on application restart.
-    // 🔴 IMPORTANT: Replace this with your own long, secure, random string in production.
-    private static final String SECRET_STRING = "YourVeryLongAndSecureSecretKeyForCommunaApp_MustBeAtLeast256BitsLongForHS256";
-    private static final Key SECRET_KEY = Keys.hmacShaKeyFor(SECRET_STRING.getBytes(StandardCharsets.UTF_8));
+    @Value("${jwt.secret}")
+    private String secretString;
+
+    private Key secretKey;
+
+    /** Build the signing key after the @Value is injected. */
+    @PostConstruct
+    private void init() {
+        this.secretKey = Keys.hmacShaKeyFor(secretString.getBytes(StandardCharsets.UTF_8));
+    }
 
     private static final long JWT_TOKEN_VALIDITY = 5 * 60 * 60 * 1000; // 5 hours
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
+    }
+
+    public String extractRole(String token) {
+        return extractClaim(token, claims -> claims.get("role", String.class));
     }
 
     public Date extractExpiration(String token) {
@@ -40,7 +52,7 @@ public class JwtUtil {
 
     private Claims extractAllClaims(String token) {
         return Jwts.parserBuilder()
-                .setSigningKey(SECRET_KEY)
+                .setSigningKey(secretKey)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
@@ -62,7 +74,7 @@ public class JwtUtil {
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY))
-                .signWith(SECRET_KEY, SignatureAlgorithm.HS256) // Specify algorithm
+                .signWith(secretKey, SignatureAlgorithm.HS256)
                 .compact();
     }
 

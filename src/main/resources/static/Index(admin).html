@@ -13,7 +13,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-    <script src="auth.js" defer></script>
+     
 </head>
 <body>
 
@@ -52,8 +52,9 @@
         </div>
     </div>
 
-    <script src="fluid.js"></script>
+      
     <script src="header-fluid.js" defer></script>
+    <script src="admin-auth-helper.js"></script>
     <script>
         // === MAIN LOGIN + LOGOUT CODE ===
         async function handleSubmit(event) {
@@ -74,8 +75,13 @@
                 if (response.ok) {
                     const admin = await response.json();
 
-                    localStorage.setItem("admin", JSON.stringify(admin));
+                    // Store the admin JWT token so API calls can use it
+                    if (admin.token) {
+                        setAdminToken(admin.token);
+                    }
+                    sessionStorage.setItem('adminData', JSON.stringify(admin));
                     sessionStorage.setItem("loggedIn", "true");
+                    localStorage.setItem("admin", JSON.stringify(admin)); // legacy compat
 
                     alert("Login successful!");
 

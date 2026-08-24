@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Clubs</title> <link rel="icon" type="image/png" href="Favicon.png">
+  <title>Communa | Clubs</title> <link rel="icon" type="image/png" href="Favicon.png">
 
   <link rel="stylesheet" href="styles.css" />
-  <script src="auth.js" defer></script>
+   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
@@ -15,11 +15,9 @@
     /* --- Base Styles --- */
     body {
       margin: 0;
-      font-family: 'inter', sans-serif;
+      font-family: 'Poppins', sans-serif;
       background-color: #0d0d0d;
       color: #fff;
-      -webkit-text-stroke: 0.75px black;
-      paint-order: stroke fill;
     }
 
     /* --- Fluid Background --- */
@@ -40,20 +38,20 @@
     /* --- Keyframe Animation for Header --- */
     @keyframes slideDownFadeIn {
       from {
-        transform: translateY(-100%);
+        transform: translate(-50%, -100%);
         opacity: 0;
       }
       to {
-        transform: translateY(0);
+        transform: translate(-50%, 0);
         opacity: 1;
       }
     }
 
     /* --- CORRECTED Header Styles --- */
     header {
-      position: absolute;
+      position: fixed;
       top: 20px;
-      left: 2%;
+      left: 50%;
       transform: translateX(-50%);
       width: 95%;
       max-width: 1600px;
@@ -61,7 +59,6 @@
       justify-content: space-between;
       align-items: center;
       padding: 10px 30px;
-      box-sizing: border-box;
       z-index: 100;
       background: rgba(255, 255, 255, 0.1);
       backdrop-filter: blur(15px);
@@ -72,11 +69,12 @@
       animation: slideDownFadeIn 1s ease-out forwards;
     }
 
+
+
    .logo {
     font-size: 24px;
     font-weight: bold;
     color: #ffffff;
-    padding: 0;
 }
 
 nav a {
@@ -165,7 +163,20 @@ nav a {
     }
 
     .logout-btn {
-        -webkit-text-stroke: 0; /* Removes stroke from Logout button */
+      background: transparent;
+      border: 1px solid #ffffff;
+      color: #ffffff;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.9rem;
+      cursor: pointer;
+      margin-left: 15px;
+      transition: background-color 0.3s ease;
+    }
+
+    .logout-btn:hover {
+      background-color: rgba(255, 255, 255, 0.2);
     }
 </style>
 </head>
@@ -182,7 +193,7 @@ nav a {
         <a href="AboutUs.html">About Us</a>
         <a href="Profile.html">Profile</a>
         <a href="Help.html">Help</a>
-        <button onclick="logout()" class="nav-button logout-btn">Logout</button>
+        <button onclick="logout()" class="logout-btn">Logout</button>
       </nav>
     </header>
 
@@ -216,5 +227,7 @@ nav a {
     window.location.href = "index.html"; // Redirects to your main login page
   }
 </script>
+<script src="auth.js"></script>
+<script src="auth-helper.js"></script>
 </body>
 </html>

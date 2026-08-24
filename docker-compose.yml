@@ -1,0 +1,73 @@
+# ============================================================
+# docker-compose.yml — Communa Local Development Stack
+# ============================================================
+# Usage:
+#   docker-compose up -d         → start everything in background
+#   docker-compose logs -f app   → stream app logs
+#   docker-compose down          → stop & remove containers
+#   docker-compose down -v       → also wipe the database volume
+# ============================================================
+
+version: '3.9'
+
+services:
+
+  # ── MySQL Database ─────────────────────────────────────────
+  db:
+    image: mysql:8.0
+    container_name: communa-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-pass}
+      MYSQL_DATABASE: communa
+      MYSQL_ROOT_HOST: '%'
+    ports:
+      - "3300:3306"   # expose on the same port the app expects
+    volumes:
+      - communa-db-data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${DB_PASSWORD:-pass}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Spring Boot Application ────────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: communa-app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
+      DB_PASSWORD: ${DB_PASSWORD:-pass}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET:-YourVeryLongAndSecureSecretKeyForCommunaApp_MustBeAtLeast256BitsLongForHS256}
+      ADMIN_CREATE_SECRET: ${ADMIN_CREATE_SECRET:-change-me-before-creating-admins}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:8082}
+      # Point to the db service — overrides localhost in application.yml
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/communa?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    ports:
+      - "8082:8082"
+    volumes:
+      - communa-logs:/var/log/communa
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8082/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  communa-db-data:
+    name: communa-db-data
+  communa-logs:
+    name: communa-logs
+
+networks:
+  default:
+    name: communa-network

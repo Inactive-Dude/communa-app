@@ -1,0 +1,25 @@
+# ============================================================
+# Communa — Development Profile
+# Activated by: SPRING_PROFILES_ACTIVE=dev  (default)
+# ============================================================
+
+spring:
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+logging:
+  level:
+    root: INFO
+    com.login.communa: DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+server:
+  # Pretty-print error responses in dev
+  error:
+    include-message: always
+    include-stacktrace: on_param

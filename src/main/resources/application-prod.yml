@@ -1,0 +1,43 @@
+# ============================================================
+# Communa — Production Profile
+# Activated by: SPRING_PROFILES_ACTIVE=prod
+# ============================================================
+# In production ALL env vars below MUST be set.
+# The app will fail to start if any required secret is missing.
+# ============================================================
+
+spring:
+  # Never auto-update schema in production — use Flyway instead
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+
+  datasource:
+    # In prod, increase pool size for higher concurrency
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 10
+      connection-timeout: 20000
+      # Recycle connections every 30 minutes
+      max-lifetime: 1800000
+
+server:
+  # Never expose error details to clients in production
+  error:
+    include-message: never
+    include-stacktrace: never
+  # Enable HTTP → HTTPS forwarding headers if behind a reverse proxy
+  forward-headers-strategy: NATIVE
+
+logging:
+  level:
+    root: WARN
+    com.login.communa: WARN
+    org.springframework.security: WARN
+    org.hibernate: WARN
+  # In production, write logs to a file
+  file:
+    name: /var/log/communa/communa.log
+  pattern:
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"

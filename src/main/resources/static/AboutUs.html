@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>About Us</title> <link rel="icon" type="image/png" href="Favicon.png"> 
-  <link rel="stylesheet" href="styles.css" /><script src="auth.js" defer></script>
+  <title>Communa | About Us</title> <link rel="icon" type="image/png" href="Favicon.png"> 
+  <link rel="stylesheet" href="styles.css" /> 
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,7 +13,7 @@
     /* --- Base Styles --- */
     body {
       margin: 0;
-      font-family: 'inter', sans-serif;
+      font-family: 'Poppins', sans-serif;
       background-color: #0d0d0d;
       color: #fff;
     }
@@ -36,11 +36,11 @@
     /* --- Keyframe Animation for Header --- */
     @keyframes slideDownFadeIn {
       from {
-        transform: translate(-50%, -150%);
+        transform: translate(-50%, -100%);
         opacity: 0;
       }
       to {
-        transform: translateX(-50%);
+        transform: translate(-50%, 0);
         opacity: 1;
       }
     }
@@ -48,7 +48,7 @@
     /* --- Liquid Glass Header --- */
     header {
       /* Positioning */
-      position: absolute;
+      position: fixed;
       top: 20px;
       left: 50%;
       transform: translateX(-50%);
@@ -61,7 +61,6 @@
       justify-content: space-between;
       align-items: center;
       padding: 10px 30px;
-      box-sizing: border-box;
 
       /* The Glass Effect */
       background: rgba(255, 255, 255, 0.1);
@@ -74,6 +73,8 @@
       /* Animation */
       animation: slideDownFadeIn 1s ease-out forwards;
     }
+
+
 
     .logo {
       font-size: 24px;
@@ -121,6 +122,24 @@
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 16px;
     }
+
+    .logout-btn {
+      background: transparent;
+      border: 1px solid #ffffff;
+      color: #ffffff;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.9rem;
+      cursor: pointer;
+      margin-left: 15px;
+      transition: background-color 0.3s ease;
+      -webkit-text-stroke: 0;
+    }
+
+    .logout-btn:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
   </style>
 </head>
 <body>
@@ -138,7 +157,7 @@
         <a href="AboutUs.html">About Us</a>
         <a href="Profile.html">Profile</a>
         <a href="Help.html">Help</a>
-        <button onclick="logout()" class="nav-button logout-btn">Logout</button>
+        <button onclick="logout()" class="logout-btn">Logout</button>
       </nav>
     </header>
 
@@ -158,12 +177,16 @@ This project was brought to life by the combined contributions of Aaron A George
 
   <!-- This script enables the fluid background -->
   <script src="scripts.js" defer></script>
+  <script src="auth-helper.js"></script>
   <script>
   function logout() {
-    // This function will redirect the user to the login page
+    if (typeof removeAuthToken === "function") removeAuthToken();
+    if (typeof clearUserData === "function") clearUserData();
+    sessionStorage.clear();
     alert("You have been logged out.");
-    window.location.href = "index.html"; // Redirects to your main login page
+    window.location.replace("index.html");
   }
 </script>
+<script src="auth.js"></script>
 </body>
 </html>

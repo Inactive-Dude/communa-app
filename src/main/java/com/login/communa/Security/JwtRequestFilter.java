@@ -1,8 +1,6 @@
 package com.login.communa.Security;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +17,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import java.util.List;
+
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
 
@@ -28,32 +28,12 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     private JwtUtil jwtUtil;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(@org.springframework.lang.NonNull HttpServletRequest request,
+                                    @org.springframework.lang.NonNull HttpServletResponse response,
+                                    @org.springframework.lang.NonNull FilterChain filterChain) throws ServletException, IOException {
 
-        // --- FIX: Add this block to ignore public endpoints ---
-        // This list should match the public URLs in your SecurityConfig file.
-        final List<String> publicEndpoints = Arrays.asList(
-            "/addUser",
-            "/loginUser",
-            "/forgot-password",
-            "/reset-password",
-            "/api/admin/login",
-            "/api/admin/create"
-        );
-
-        // Check if the request URI is for a public endpoint or a static file
-        String requestURI = request.getRequestURI();
-        boolean isPublicEndpoint = publicEndpoints.stream().anyMatch(requestURI::equals);
-        boolean isStaticAsset = requestURI.matches(".*(\\.html|\\.css|\\.js|\\.png|\\.jpg|\\.mp4|\\.ico)$");
-
-        if (isPublicEndpoint || isStaticAsset) {
-            // If it's a public URL or a static asset, skip the token check and continue the filter chain.
-            filterChain.doFilter(request, response);
-            return;
-        }
-        // --- End of Fix ---
+        // Spring Security's permitAll() and WebSecurityCustomizer rules handle public/static
+        // paths before this filter is reached — no need to duplicate that logic here.
 
         final String authorizationHeader = request.getHeader("Authorization");
         String username = null;
@@ -71,7 +51,11 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             try {
                 if (jwtUtil.validateToken(jwt, username)) {
-                    List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
+                    // Honour the role stored in the JWT claim (USER or ADMIN)
+                    String role = jwtUtil.extractRole(jwt);
+                    String authority = (role != null) ? "ROLE_" + role : "ROLE_USER";
+
+                    List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(authority));
 
                     UsernamePasswordAuthenticationToken authToken =
                             new UsernamePasswordAuthenticationToken(username, null, authorities);

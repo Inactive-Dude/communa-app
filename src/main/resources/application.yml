@@ -1,0 +1,88 @@
+# ============================================================
+# Communa — Main Spring Boot Configuration
+# ============================================================
+# Active profile is selected by the SPRING_PROFILES_ACTIVE env var:
+#   dev  → uses application-dev.yml  (default when not set)
+#   prod → uses application-prod.yml
+# ============================================================
+
+spring:
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+
+  # ─── Application name ────────────────────────────────────
+  application:
+    name: communa
+
+  # ─── MVC ─────────────────────────────────────────────────
+  mvc:
+    pathmatch:
+      matching-strategy: ANT_PATH_MATCHER
+
+  # ─── Database ────────────────────────────────────────────
+  datasource:
+    url: jdbc:mysql://localhost:3300/communa?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: root
+    # Set DB_PASSWORD env var — falls back to 'pass' for local dev
+    password: ${DB_PASSWORD:pass}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+
+  # ─── JPA / Hibernate ─────────────────────────────────────
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    # NOTE: Use 'validate' + Flyway/Liquibase in production
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+
+  # ─── Email (Gmail SMTP) ───────────────────────────────────
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: aaronageorge2@gmail.com
+    # Set MAIL_PASSWORD env var to your Gmail App Password
+    password: ${MAIL_PASSWORD:your-gmail-app-password-here}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          ssl:
+            trust: smtp.gmail.com
+
+# ─── Server ──────────────────────────────────────────────────
+server:
+  port: ${SERVER_PORT:8082}
+  error:
+    include-message: never   # don't leak stack traces to clients
+    include-stacktrace: never
+
+# ─── Custom App Properties ───────────────────────────────────
+app:
+  frontend:
+    url: ${FRONTEND_URL:http://localhost:8082}
+
+jwt:
+  secret: ${JWT_SECRET:YourVeryLongAndSecureSecretKeyForCommunaApp_MustBeAtLeast256BitsLongForHS256}
+
+admin:
+  create:
+    secret: ${ADMIN_CREATE_SECRET:change-me-before-creating-admins}
+
+# ─── Logging (base — overridden per profile) ─────────────────
+logging:
+  level:
+    root: WARN
+    com.login.communa: INFO
+    org.springframework.security: WARN
+    org.hibernate.SQL: WARN
+    org.hibernate.type.descriptor.sql.BasicBinder: WARN

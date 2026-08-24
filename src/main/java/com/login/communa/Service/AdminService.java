@@ -14,30 +14,36 @@ public class AdminService {
 
     @Autowired
     private AdminRepository repository;
-    
+
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    // ✅ Existing authenticate method modified to accept raw password
-        public Admin authenticate(String email, String rawPassword) {
-    Optional<Admin> adminOpt = repository.findByEmail(email);
-    if (adminOpt.isEmpty()) {
+    /**
+     * Authenticate an admin with their email and raw (plain-text) password.
+     * Passwords are stored as BCrypt hashes; plain-text comparison is NOT used.
+     */
+    public Admin authenticate(String email, String rawPassword) {
+        Optional<Admin> adminOpt = repository.findByEmail(email);
+        if (adminOpt.isEmpty()) {
+            return null;
+        }
+
+        Admin admin = adminOpt.get();
+        if (passwordEncoder.matches(rawPassword, admin.getPassword())) {
+            return admin;
+        }
         return null;
     }
 
-    Admin admin = adminOpt.get();
-    // Directly compare the raw password string
-    if (rawPassword.equals(admin.getPassword())) { // This line now checks plain text
-        return admin;
-    }
-    return null;
-}
-    // ✅ Safe wrapper method to support older "login()" calls
-    public Admin login(String email, String rawPassword) {
-        return authenticate(email, rawPassword);
-    }
-
+    /**
+     * Create a new admin account. The password is BCrypt-hashed before saving.
+     * Throws if the email is already registered.
+     */
     public Admin createAdmin(Admin admin) {
-    return repository.save(admin);
+        if (repository.findByEmail(admin.getEmail()).isPresent()) {
+            throw new RuntimeException("An admin with this email already exists.");
+        }
+        admin.setPassword(passwordEncoder.encode(admin.getPassword()));
+        return repository.save(admin);
     }
 }

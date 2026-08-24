@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-    <script src="auth.js" defer></script>
+     
     <style>
         body {
             margin: 0;
@@ -310,7 +310,10 @@ postButton.addEventListener('click', async () => {
     try {
         const response = await fetch('http://localhost:8082/api/announcements/add', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                ...( getAdminToken() ? { 'Authorization': `Bearer ${getAdminToken()}` } : {} )
+            },
             body: JSON.stringify(newAnnouncement)
         });
 
@@ -337,6 +340,9 @@ postButton.addEventListener('click', async () => {
     }
 });
 </script>
+<script src="admin-auth-helper.js"></script>
+<script src="auth.js"></script>
+<script src="auth-helper.js"></script>
 </body>
 </html>
    

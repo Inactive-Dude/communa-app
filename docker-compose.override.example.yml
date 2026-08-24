@@ -1,0 +1,41 @@
+# ============================================================
+# docker-compose.override.yml — Local Developer Overrides
+# ============================================================
+# This file is automatically merged with docker-compose.yml
+# by Docker Compose when you run `docker-compose up`.
+# It is intentionally gitignored — each developer can have
+# their own overrides without affecting teammates.
+#
+# To use: copy this file to docker-compose.override.yml
+#   cp docker-compose.override.example.yml docker-compose.override.yml
+# ============================================================
+
+version: '3.9'
+
+services:
+
+  # Override DB to expose an additional Adminer UI for easy browsing
+  db:
+    environment:
+      # Extra: enable slow query log in dev
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-pass}
+
+  app:
+    # Mount source for quick JAR swaps (if using exploded deployment)
+    volumes:
+      - ./target:/app/hot
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      JAVA_OPTS: "-Xms128m -Xmx256m -Dspring.devtools.restart.enabled=true"
+
+  # ── Adminer — lightweight database GUI ─────────────────────
+  adminer:
+    image: adminer:latest
+    container_name: communa-adminer
+    restart: unless-stopped
+    ports:
+      - "8090:8080"
+    depends_on:
+      - db
+    environment:
+      ADMINER_DEFAULT_SERVER: db
