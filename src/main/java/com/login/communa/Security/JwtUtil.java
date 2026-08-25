@@ -56,12 +56,12 @@ public class JwtUtil {
         );
     }
 
-    public <T> T extractClaim(String token, @NonNull Function<@NonNull Claims, T> claimsResolver) {
+    public <T> T extractClaim(String token, @NonNull Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
 
-    private @NonNull Claims extractAllClaims(String token) {
+    private Claims extractAllClaims(String token) {
         return Objects.requireNonNull(
             Jwts.parserBuilder()
                 .setSigningKey(secretKey)
