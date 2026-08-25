@@ -110,7 +110,7 @@ public class EmailService {
             helper.setFrom(Objects.requireNonNull(fromEmail, "fromEmail must not be null"));
             helper.setTo(Objects.requireNonNull(toEmail, "toEmail must not be null"));
             helper.setSubject("Password Reset Request \u2014 Communa");
-            helper.setText(html, true);
+            helper.setText(Objects.requireNonNull(html, "html must not be null"), true);
             mailSender.send(message);
             logger.info("Password reset email sent to: {}", toEmail);
         } catch (MessagingException e) {
@@ -188,7 +188,7 @@ public class EmailService {
             helper.setFrom(Objects.requireNonNull(fromEmail, "fromEmail must not be null"));
             helper.setTo(Objects.requireNonNull(toEmail, "toEmail must not be null"));
             helper.setSubject("Verify Your Email \u2014 Communa");
-            helper.setText(html, true);
+            helper.setText(Objects.requireNonNull(html, "html must not be null"), true);
             mailSender.send(message);
             logger.info("Verification email sent to: {}", toEmail);
         } catch (MessagingException e) {
