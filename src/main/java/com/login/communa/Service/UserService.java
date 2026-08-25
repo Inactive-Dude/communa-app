@@ -1,12 +1,15 @@
 package com.login.communa.Service;
 
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
+import java.util.Base64;
 import java.util.Optional;
-import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.login.communa.Entity.Users;
 import com.login.communa.Repository.UsersRepo;
 
@@ -19,50 +22,20 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    /** Cryptographically secure random generator for all tokens. */
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
+
     /** How many seconds a user must wait between forgot-password requests. */
     private static final long RESET_COOLDOWN_SECONDS = 60;
 
-    public Users addUser(Users user) {
-        Optional<Users> existing = usersRepo.findByEmail(user.getEmail());
-        if (existing.isPresent()) {
-            throw new RuntimeException("User with this email already exists");
-        }
-
-        // Hash the password before saving
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-
-        // Set up email verification
-        user.setEmailVerified(false);
-        String token = UUID.randomUUID().toString();
-        user.setVerificationToken(token);
-        user.setVerificationTokenExpiry(LocalDateTime.now().plusHours(24));
-
-        return usersRepo.save(user);
-    }
-
-    public Users authenticateUser(String email, String rawPassword) {
-        Optional<Users> userOpt = usersRepo.findByEmail(email);
-        if (userOpt.isEmpty()) {
-            return null;
-        }
-
-        Users user = userOpt.get();
-
-        // Check if email is verified
-        if (!user.isEmailVerified()) {
-            throw new RuntimeException("EMAIL_NOT_VERIFIED");
-        }
-
-        // Check if password matches
-        if (passwordEncoder.matches(rawPassword, user.getPassword())) {
-            return user;
-        }
-        return null;
-    }
-
-    public Users getUserByEmail(String email) {
-        return usersRepo.findByEmail(email)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+    /**
+     * Generates a 32-byte, URL-safe, cryptographically secure random token.
+     * Replaces the previous UUID.randomUUID() approach which used a non-CSPRNG.
+     */
+    private String generateSecureToken() {
+        byte[] bytes = new byte[32];
+        SECURE_RANDOM.nextBytes(bytes);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
     }
 
     /**
@@ -90,6 +63,52 @@ public class UserService {
         "SCT", "Saintgits College of Engineering"
     );
 
+    @Transactional
+    public Users addUser(Users user) {
+        Optional<Users> existing = usersRepo.findByEmail(user.getEmail());
+        if (existing.isPresent()) {
+            throw new RuntimeException("User with this email already exists");
+        }
+
+        // Hash the password before saving
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+        // Set up email verification with a cryptographically secure token
+        user.setEmailVerified(false);
+        user.setVerificationToken(generateSecureToken());
+        user.setVerificationTokenExpiry(LocalDateTime.now().plusHours(24));
+
+        return usersRepo.save(user);
+    }
+
+    @Transactional(readOnly = true)
+    public Users authenticateUser(String email, String rawPassword) {
+        Optional<Users> userOpt = usersRepo.findByEmail(email);
+        if (userOpt.isEmpty()) {
+            return null;
+        }
+
+        Users user = userOpt.get();
+
+        // Check if email is verified
+        if (!user.isEmailVerified()) {
+            throw new RuntimeException("EMAIL_NOT_VERIFIED");
+        }
+
+        // Check if password matches
+        if (passwordEncoder.matches(rawPassword, user.getPassword())) {
+            return user;
+        }
+        return null;
+    }
+
+    @Transactional(readOnly = true)
+    public Users getUserByEmail(String email) {
+        return usersRepo.findByEmail(email)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
+    @Transactional
     public Users updateProfile(String email, String admissionNumber, String universityRegisterNumber) {
         Optional<Users> userOpt = usersRepo.findByEmail(email);
         if (userOpt.isEmpty()) {
@@ -118,10 +137,12 @@ public class UserService {
     /**
      * Generate a password-reset token for the given email.
      * Enforces a {@value #RESET_COOLDOWN_SECONDS}-second cooldown per user to prevent abuse.
+     * Uses a cryptographically secure random token (SecureRandom, 32 bytes).
      *
      * @throws RuntimeException with code "USER_NOT_FOUND" if no account matches.
      * @throws RuntimeException with code "RESET_TOO_SOON" if within the cooldown window.
      */
+    @Transactional
     public String generateResetToken(String email) {
         Optional<Users> userOpt = usersRepo.findByEmail(email);
         if (userOpt.isEmpty()) {
@@ -140,7 +161,7 @@ public class UserService {
             }
         }
 
-        String token = UUID.randomUUID().toString();
+        String token = generateSecureToken();
         user.setResetToken(token);
         user.setTokenExpiry(LocalDateTime.now().plusHours(1));
         user.setPasswordResetRequestedAt(LocalDateTime.now());
@@ -149,6 +170,7 @@ public class UserService {
         return token;
     }
 
+    @Transactional
     public boolean resetPassword(String token, String newPassword) {
         Optional<Users> userOpt = usersRepo.findByResetToken(token);
         if (userOpt.isEmpty()) {
@@ -158,7 +180,7 @@ public class UserService {
         Users user = userOpt.get();
 
         // Check if token is expired
-        if (user.getTokenExpiry().isBefore(LocalDateTime.now())) {
+        if (user.getTokenExpiry() == null || user.getTokenExpiry().isBefore(LocalDateTime.now())) {
             return false;
         }
 
@@ -174,6 +196,7 @@ public class UserService {
     /**
      * Verify a user's email using the verification token.
      */
+    @Transactional
     public boolean verifyEmail(String token) {
         Optional<Users> userOpt = usersRepo.findByVerificationToken(token);
         if (userOpt.isEmpty()) {
@@ -198,8 +221,9 @@ public class UserService {
     }
 
     /**
-     * Resend verification email by generating a new token.
+     * Resend verification email by generating a new cryptographically secure token.
      */
+    @Transactional
     public String resendVerificationToken(String email) {
         Optional<Users> userOpt = usersRepo.findByEmail(email);
         if (userOpt.isEmpty()) {
@@ -212,11 +236,10 @@ public class UserService {
             throw new RuntimeException("Email is already verified");
         }
 
-        String token = UUID.randomUUID().toString();
-        user.setVerificationToken(token);
+        user.setVerificationToken(generateSecureToken());
         user.setVerificationTokenExpiry(LocalDateTime.now().plusHours(24));
         usersRepo.save(user);
 
-        return token;
+        return user.getVerificationToken();
     }
 }

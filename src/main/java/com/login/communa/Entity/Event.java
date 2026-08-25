@@ -13,7 +13,14 @@ public class Event {
 
     private String title;
 
+    /**
+     * Mapped to the "event_date" column defined in init.sql.
+     * Previously mapped as "date" which caused a silent schema mismatch
+     * with the DBA-managed init.sql definition.
+     */
+    @Column(name = "event_date")
     private LocalDate date;
+
     private String time;
     private String location;
 

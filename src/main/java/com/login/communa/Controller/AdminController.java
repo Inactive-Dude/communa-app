@@ -3,6 +3,8 @@ package com.login.communa.Controller;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,6 +20,8 @@ import com.login.communa.Service.AdminService;
 @RestController
 @RequestMapping("/api/admin")
 public class AdminController {
+
+    private static final Logger logger = LoggerFactory.getLogger(AdminController.class);
 
     private final AdminService service;
     private final JwtUtil jwtUtil;
@@ -80,8 +84,16 @@ public class AdminController {
                 "email", created.getEmail(),
                 "clubName", created.getClubName()
             ));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        } catch (RuntimeException e) {
+            // Log the real cause server-side (may include SQL/constraint details)
+            logger.error("Admin creation failed for email={}: {}", admin.getEmail(), e.getMessage(), e);
+
+            // Return a safe, generic error — never expose raw exception messages to clients
+            // as they can reveal SQL statements, table names, or constraint names.
+            String safeMessage = e.getMessage() != null && e.getMessage().startsWith("An admin")
+                    ? e.getMessage()   // our own controlled message from AdminService
+                    : "Admin creation failed. Check the provided details and try again.";
+            return ResponseEntity.badRequest().body(Map.of("error", safeMessage));
         }
     }
 }
