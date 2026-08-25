@@ -2,8 +2,11 @@ package com.login.communa.Service;
 
 import com.login.communa.Entity.Event;
 import com.login.communa.Repository.EventRepository;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class EventService {
@@ -12,7 +15,15 @@ public class EventService {
 
     public EventService(EventRepository repo) { this.repo = repo; }
 
-    public Event addEvent(Event event) { return repo.save(event); }
+    public @NonNull Event addEvent(@NonNull Event event) {
+        // repo.save() returns @NonNull per Spring Data contract — guard for IDE null analysis.
+        return Objects.requireNonNull(
+            repo.save(event),
+            "Saved event must not be null"
+        );
+    }
 
-    public List<Event> getEventsByClub(String clubName) { return repo.findByClubNameOrderByDateAsc(clubName); }
+    public @NonNull List<Event> getEventsByClub(@NonNull String clubName) {
+        return repo.findByClubNameOrderByDateAsc(clubName);
+    }
 }

@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import java.util.Objects;
+import org.springframework.lang.NonNull;
 
 @Service
 public class EmailService {
@@ -21,7 +23,7 @@ public class EmailService {
     @Value("${spring.mail.username}")
     private String fromEmail;
 
-    public void sendResetEmail(String toEmail, String token) throws MessagingException {
+    public void sendResetEmail(@NonNull String toEmail, @NonNull String token) throws MessagingException {
         String resetUrl = frontendUrl + "/reset-password.html?token=" + token;
 
         String html = """
@@ -82,14 +84,14 @@ public class EmailService {
 
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, "UTF-8");
-        helper.setFrom(fromEmail);
-        helper.setTo(toEmail);
-        helper.setSubject("Password Reset Request — Communa");
-        helper.setText(html, true); // true = HTML
+        helper.setFrom(Objects.requireNonNull(fromEmail, "fromEmail must not be null"));
+        helper.setTo(Objects.requireNonNull(toEmail, "toEmail must not be null"));
+        helper.setSubject("Password Reset Request \u2014 Communa");
+        helper.setText(Objects.requireNonNull(html, "html must not be null"), true);
         mailSender.send(message);
     }
 
-    public void sendVerificationEmail(String toEmail, String token) throws MessagingException {
+    public void sendVerificationEmail(@NonNull String toEmail, @NonNull String token) throws MessagingException {
         String verifyUrl = frontendUrl + "/verify-email.html?token=" + token;
 
         String html = """
@@ -148,10 +150,10 @@ public class EmailService {
 
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, "UTF-8");
-        helper.setFrom(fromEmail);
-        helper.setTo(toEmail);
-        helper.setSubject("Verify Your Email — Communa");
-        helper.setText(html, true); // true = HTML
+        helper.setFrom(Objects.requireNonNull(fromEmail, "fromEmail must not be null"));
+        helper.setTo(Objects.requireNonNull(toEmail, "toEmail must not be null"));
+        helper.setSubject("Verify Your Email \u2014 Communa");
+        helper.setText(Objects.requireNonNull(html, "html must not be null"), true);
         mailSender.send(message);
     }
 }

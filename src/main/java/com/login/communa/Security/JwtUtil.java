@@ -5,9 +5,11 @@ import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.Claims;
@@ -34,31 +36,43 @@ public class JwtUtil {
     private static final long JWT_TOKEN_VALIDITY = 5 * 60 * 60 * 1000; // 5 hours
 
     public String extractUsername(String token) {
-        return extractClaim(token, Claims::getSubject);
+        // Claims::getSubject may return null per JJWT's API contract;
+        // we guard with requireNonNull to satisfy @NonNull callers downstream.
+        return Objects.requireNonNull(
+            extractClaim(token, claims -> claims.getSubject()),
+            "JWT subject claim must not be null"
+        );
     }
 
     public String extractRole(String token) {
         return extractClaim(token, claims -> claims.get("role", String.class));
     }
 
-    public Date extractExpiration(String token) {
-        return extractClaim(token, Claims::getExpiration);
+    public @NonNull Date extractExpiration(String token) {
+        // Claims::getExpiration is guaranteed non-null by JJWT for valid tokens.
+        return Objects.requireNonNull(
+            extractClaim(token, claims -> claims.getExpiration()),
+            "JWT expiration claim must not be null"
+        );
     }
 
-    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+    public <T> T extractClaim(String token, @NonNull Function<@NonNull Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
 
-    private Claims extractAllClaims(String token) {
-        return Jwts.parserBuilder()
+    private @NonNull Claims extractAllClaims(String token) {
+        return Objects.requireNonNull(
+            Jwts.parserBuilder()
                 .setSigningKey(secretKey)
                 .build()
                 .parseClaimsJws(token)
-                .getBody();
+                .getBody(),
+            "JWT claims body must not be null"
+        );
     }
 
-    private Boolean isTokenExpired(String token) {
+    private boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
 
@@ -78,8 +92,8 @@ public class JwtUtil {
                 .compact();
     }
 
-    public Boolean validateToken(String token, String username) {
+    public boolean validateToken(String token, @NonNull String username) {
         final String extractedUsername = extractUsername(token);
-        return (extractedUsername.equals(username) && !isTokenExpired(token));
+        return (username.equals(extractedUsername) && !isTokenExpired(token));
     }
 }
