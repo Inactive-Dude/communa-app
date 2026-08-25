@@ -2,6 +2,7 @@ package com.login.communa.Controller;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +55,10 @@ public class UsersController {
 
             // Send verification email (non-fatal if it fails)
             try {
-                emailService.sendVerificationEmail(savedUser.getEmail(), savedUser.getVerificationToken());
+                emailService.sendVerificationEmail(
+                        Objects.requireNonNull(savedUser.getEmail(), "user email must not be null"),
+                        Objects.requireNonNull(savedUser.getVerificationToken(), "verification token must not be null")
+                );
                 logger.info("Verification email sent to: {}", savedUser.getEmail());
             } catch (Exception emailEx) {
                 logger.error("Failed to send verification email to {}: {}", savedUser.getEmail(), emailEx.getMessage());
@@ -209,7 +213,10 @@ public class UsersController {
             String token = userService.generateResetToken(email);
 
             try {
-                emailService.sendResetEmail(email, token);
+                emailService.sendResetEmail(
+                        Objects.requireNonNull(email, "email must not be null"),
+                        Objects.requireNonNull(token, "reset token must not be null")
+                );
                 logger.info("Password reset email sent to: {}", email);
             } catch (Exception emailEx) {
                 logger.error("Failed to send reset email to {}: {}", email, emailEx.getMessage(), emailEx);
@@ -282,7 +289,10 @@ public class UsersController {
             String token = userService.resendVerificationToken(email);
 
             try {
-                emailService.sendVerificationEmail(email, token);
+                emailService.sendVerificationEmail(
+                        Objects.requireNonNull(email, "email must not be null"),
+                        Objects.requireNonNull(token, "verification token must not be null")
+                );
                 logger.info("Verification email resent to: {}", email);
                 return ResponseEntity.ok(Map.of("message", "Verification email sent! Please check your inbox."));
             } catch (Exception emailEx) {
