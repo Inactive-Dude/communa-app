@@ -24,6 +24,9 @@ public class EventService {
     }
 
     public @NonNull List<Event> getEventsByClub(@NonNull String clubName) {
-        return repo.findByClubNameOrderByDateAsc(clubName);
+        return Objects.requireNonNull(
+            repo.findByClubNameOrderByDateAsc(clubName),
+            "Event list must not be null"
+        );
     }
 }
