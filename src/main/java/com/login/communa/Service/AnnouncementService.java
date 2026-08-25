@@ -26,6 +26,9 @@ public class AnnouncementService {
     }
 
     public @NonNull List<Announcement> getAnnouncementsByClub(@NonNull String clubName) {
-        return repo.findByClubNameOrderByPostedAtDesc(clubName);
+        return Objects.requireNonNull(
+            repo.findByClubNameOrderByPostedAtDesc(clubName),
+            "Announcement list must not be null"
+        );
     }
 }
