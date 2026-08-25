@@ -44,15 +44,31 @@ public class SecurityConfig {
                     "/verify-email",
                     "/resend-verification",
                     "/api/admin/login"
-                    // NOTE: /api/admin/create is intentionally NOT public.
-                    //       It is protected by the X-Admin-Secret header inside the controller.
                 ).permitAll()
 
-                // Root and named HTML pages that must be accessible without login
+                // Public pages — accessible without login
                 .requestMatchers(
                     "/", "/index.html", "/newpage.html", "/Profile.html",
-                    "/Help.html", "/AboutUs.html", "/Clubs.html", "/favicon.ico"
+                    "/Help.html", "/AboutUs.html", "/Clubs.html",
+                    "/forgot-password.html", "/reset-password.html", "/verify-email.html",
+                    "/favicon.ico"
                 ).permitAll()
+
+                // Club public pages (HTML) — any authenticated user
+                .requestMatchers(
+                    "/**-announcements.html", "/**-events.html",
+                    "/Coding Club.html", "/IEEE.html", "/NSS.html",
+                    "/CSI.html", "/IEDC.html", "/Meckartans.html", "/Tinker Hub.html",
+                    "/Clique.html", "/Mulearn.html", "/Film Club.html",
+                    "/Music Club.html", "/Velosters.html",
+                    "/Break through science society.html"
+                ).hasAnyRole("USER", "ADMIN")
+
+                // Admin panel HTML pages — ADMIN role required
+                .requestMatchers(
+                    "/Index(admin).html",
+                    "/**admin**.html"
+                ).hasRole("ADMIN")
 
                 // Admin API write operations require ADMIN role
                 .requestMatchers(HttpMethod.POST, "/api/announcements/add").hasRole("ADMIN")
@@ -74,10 +90,10 @@ public class SecurityConfig {
      * Static assets bypass Spring Security entirely — no filter chain overhead.
      * This is the single, canonical place for static-resource exclusions.
      */
-    @Bean
+@Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> web.ignoring().requestMatchers(
-                "/**/*.html",
+                // Static assets only — NOT HTML pages (those go through the filter chain)
                 "/**/*.css",
                 "/**/*.js",
                 "/**/*.png",

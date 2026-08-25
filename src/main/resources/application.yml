@@ -72,6 +72,8 @@ app:
     url: ${FRONTEND_URL:http://localhost:8082}
 
 jwt:
+  # REQUIRED — no default. Set JWT_SECRET env var before starting.
+  # Generate a strong key: openssl rand -base64 64
   secret: ${JWT_SECRET:YourVeryLongAndSecureSecretKeyForCommunaApp_MustBeAtLeast256BitsLongForHS256}
 
 admin:
