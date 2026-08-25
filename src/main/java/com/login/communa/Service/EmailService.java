@@ -1,9 +1,12 @@
 package com.login.communa.Service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import jakarta.mail.MessagingException;
@@ -11,8 +14,22 @@ import jakarta.mail.internet.MimeMessage;
 import java.util.Objects;
 import org.springframework.lang.NonNull;
 
+/**
+ * Handles all outbound email delivery for Communa.
+ *
+ * All public send methods are @Async — they execute on a background thread pool
+ * so that Gmail SMTP handshakes (1-3 sec) do NOT block inbound HTTP request threads.
+ * This resolves the high-severity issue where synchronous email dispatch was
+ * exhausting the Tomcat thread pool under load.
+ *
+ * Exception handling is done inside each method because the @Async proxy
+ * detaches execution from the caller's thread, making the caller's try-catch
+ * unable to see SMTP exceptions. Errors are logged here server-side.
+ */
 @Service
 public class EmailService {
+
+    private static final Logger logger = LoggerFactory.getLogger(EmailService.class);
 
     @Autowired
     private JavaMailSender mailSender;
@@ -23,7 +40,12 @@ public class EmailService {
     @Value("${spring.mail.username}")
     private String fromEmail;
 
-    public void sendResetEmail(@NonNull String toEmail, @NonNull String token) throws MessagingException {
+    /**
+     * Sends a password-reset email asynchronously.
+     * Runs on the Spring async thread pool — does NOT block the caller.
+     */
+    @Async
+    public void sendResetEmail(@NonNull String toEmail, @NonNull String token) {
         String resetUrl = frontendUrl + "/reset-password.html?token=" + token;
 
         String html = """
@@ -82,16 +104,28 @@ public class EmailService {
             </html>
             """.formatted(resetUrl, resetUrl, resetUrl);
 
-        MimeMessage message = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message, "UTF-8");
-        helper.setFrom(Objects.requireNonNull(fromEmail, "fromEmail must not be null"));
-        helper.setTo(Objects.requireNonNull(toEmail, "toEmail must not be null"));
-        helper.setSubject("Password Reset Request \u2014 Communa");
-        helper.setText(Objects.requireNonNull(html, "html must not be null"), true);
-        mailSender.send(message);
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, "UTF-8");
+            helper.setFrom(Objects.requireNonNull(fromEmail, "fromEmail must not be null"));
+            helper.setTo(Objects.requireNonNull(toEmail, "toEmail must not be null"));
+            helper.setSubject("Password Reset Request \u2014 Communa");
+            helper.setText(html, true);
+            mailSender.send(message);
+            logger.info("Password reset email sent to: {}", toEmail);
+        } catch (MessagingException e) {
+            // Log here because @Async detaches this from the caller's thread;
+            // the caller's try-catch cannot see this exception.
+            logger.error("Failed to send password reset email to {}: {}", toEmail, e.getMessage(), e);
+        }
     }
 
-    public void sendVerificationEmail(@NonNull String toEmail, @NonNull String token) throws MessagingException {
+    /**
+     * Sends an email verification link asynchronously.
+     * Runs on the Spring async thread pool — does NOT block the caller.
+     */
+    @Async
+    public void sendVerificationEmail(@NonNull String toEmail, @NonNull String token) {
         String verifyUrl = frontendUrl + "/verify-email.html?token=" + token;
 
         String html = """
@@ -148,12 +182,19 @@ public class EmailService {
             </html>
             """.formatted(verifyUrl, verifyUrl, verifyUrl);
 
-        MimeMessage message = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message, "UTF-8");
-        helper.setFrom(Objects.requireNonNull(fromEmail, "fromEmail must not be null"));
-        helper.setTo(Objects.requireNonNull(toEmail, "toEmail must not be null"));
-        helper.setSubject("Verify Your Email \u2014 Communa");
-        helper.setText(Objects.requireNonNull(html, "html must not be null"), true);
-        mailSender.send(message);
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, "UTF-8");
+            helper.setFrom(Objects.requireNonNull(fromEmail, "fromEmail must not be null"));
+            helper.setTo(Objects.requireNonNull(toEmail, "toEmail must not be null"));
+            helper.setSubject("Verify Your Email \u2014 Communa");
+            helper.setText(html, true);
+            mailSender.send(message);
+            logger.info("Verification email sent to: {}", toEmail);
+        } catch (MessagingException e) {
+            // Log here because @Async detaches this from the caller's thread;
+            // the caller's try-catch cannot see this exception.
+            logger.error("Failed to send verification email to {}: {}", toEmail, e.getMessage(), e);
+        }
     }
 }

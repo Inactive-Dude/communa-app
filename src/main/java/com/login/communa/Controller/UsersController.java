@@ -53,16 +53,12 @@ public class UsersController {
         try {
             Users savedUser = userService.addUser(user);
 
-            // Send verification email (non-fatal if it fails)
-            try {
-                emailService.sendVerificationEmail(
-                        Objects.requireNonNull(savedUser.getEmail(), "user email must not be null"),
-                        Objects.requireNonNull(savedUser.getVerificationToken(), "verification token must not be null")
-                );
-                logger.info("Verification email sent to: {}", savedUser.getEmail());
-            } catch (Exception emailEx) {
-                logger.error("Failed to send verification email to {}: {}", savedUser.getEmail(), emailEx.getMessage());
-            }
+            // Fire-and-forget: @Async runs SMTP on a background thread.
+            // Exceptions are caught and logged inside EmailService itself.
+            emailService.sendVerificationEmail(
+                    Objects.requireNonNull(savedUser.getEmail(), "user email must not be null"),
+                    Objects.requireNonNull(savedUser.getVerificationToken(), "verification token must not be null")
+            );
 
             Map<String, Object> response = new HashMap<>();
             response.put("email", savedUser.getEmail());
@@ -212,16 +208,12 @@ public class UsersController {
         try {
             String token = userService.generateResetToken(email);
 
-            try {
-                emailService.sendResetEmail(
-                        Objects.requireNonNull(email, "email must not be null"),
-                        Objects.requireNonNull(token, "reset token must not be null")
-                );
-                logger.info("Password reset email sent to: {}", email);
-            } catch (Exception emailEx) {
-                logger.error("Failed to send reset email to {}: {}", email, emailEx.getMessage(), emailEx);
-                return ResponseEntity.status(500).body(Map.of("error", "Failed to send email: " + emailEx.getMessage()));
-            }
+            // Fire-and-forget: @Async runs SMTP on a background thread.
+            // Exceptions are caught and logged inside EmailService itself.
+            emailService.sendResetEmail(
+                    Objects.requireNonNull(email, "email must not be null"),
+                    Objects.requireNonNull(token, "reset token must not be null")
+            );
 
         } catch (RuntimeException e) {
             if ("RESET_TOO_SOON".equals(e.getMessage())) {
@@ -288,17 +280,13 @@ public class UsersController {
         try {
             String token = userService.resendVerificationToken(email);
 
-            try {
-                emailService.sendVerificationEmail(
-                        Objects.requireNonNull(email, "email must not be null"),
-                        Objects.requireNonNull(token, "verification token must not be null")
-                );
-                logger.info("Verification email resent to: {}", email);
-                return ResponseEntity.ok(Map.of("message", "Verification email sent! Please check your inbox."));
-            } catch (Exception emailEx) {
-                logger.error("Failed to resend verification email to {}: {}", email, emailEx.getMessage());
-                return ResponseEntity.status(500).body(Map.of("error", "Failed to send email: " + emailEx.getMessage()));
-            }
+            // Fire-and-forget: @Async runs SMTP on a background thread.
+            // Exceptions are caught and logged inside EmailService itself.
+            emailService.sendVerificationEmail(
+                    Objects.requireNonNull(email, "email must not be null"),
+                    Objects.requireNonNull(token, "verification token must not be null")
+            );
+            return ResponseEntity.ok(Map.of("message", "Verification email sent! Please check your inbox."));
         } catch (RuntimeException e) {
             logger.error("Resend verification error: {}", e.getMessage());
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));

@@ -18,7 +18,20 @@ public class Users {
     @NotBlank(message = "Name is required")
     private String name;
 
+    /**
+     * Unique admission number assigned by the college.
+     * Enforced unique at DB level to prevent two accounts claiming the same ID.
+     */
+    @Column(unique = true, length = 50)
+    @Size(max = 50, message = "Admission number must not exceed 50 characters")
     private String admissionNumber;
+
+    /**
+     * Unique university register number (e.g., SCT24CS002).
+     * Enforced unique at DB level — each student has exactly one register number.
+     */
+    @Column(name = "university_register_number", unique = true, length = 20)
+    @Size(max = 20, message = "University register number must not exceed 20 characters")
     private String universityRegisterNumber;
     private String collegeName;
     private String branch;

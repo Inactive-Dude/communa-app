@@ -144,7 +144,11 @@ public class UserService {
      */
     @Transactional
     public String generateResetToken(String email) {
-        Optional<Users> userOpt = usersRepo.findByEmail(email);
+        // Use a pessimistic write lock (SELECT FOR UPDATE) so that concurrent
+        // requests for the same email are serialised at the DB level.
+        // This prevents two simultaneous reset requests from both bypassing
+        // the 60-second cooldown window — the race condition described in issue 2.3.
+        Optional<Users> userOpt = usersRepo.findByEmailForUpdate(email);
         if (userOpt.isEmpty()) {
             throw new RuntimeException("USER_NOT_FOUND");
         }
