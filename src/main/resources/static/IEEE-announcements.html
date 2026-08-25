@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -250,7 +250,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const announcementsList = document.getElementById('announcements-list');
 
     try {
-        const response = await fetch('http://localhost:8082/api/announcements/club/IEEE');
+        const response = await fetch('/api/announcements/club/IEEE');
         if (!response.ok) throw new Error("Failed to fetch announcements");
         
         const announcements = await response.json();

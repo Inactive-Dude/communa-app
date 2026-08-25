@@ -268,7 +268,7 @@
             status.style.color = '#ffd700';
 
             try {
-                const resp = await fetch('http://localhost:8082/resend-verification', {
+                const resp = await fetch('/resend-verification', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email: registeredEmail }),
@@ -329,7 +329,7 @@
             }
 
             try {
-                const response = await fetch("http://localhost:8082/loginUser", {
+                const response = await fetch("/loginUser", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ email: email, password: password }),
@@ -386,7 +386,7 @@
             const newUser = { name, admissionNumber: admission, universityRegisterNumber: universityReg, email, password };
 
             try {
-                const response = await fetch("http://localhost:8082/addUser", {
+                const response = await fetch("/addUser", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(newUser),

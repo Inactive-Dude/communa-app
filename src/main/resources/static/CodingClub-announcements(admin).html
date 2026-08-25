@@ -309,7 +309,7 @@
             };
 
             try {
-                const response = await fetch('http://localhost:8082/api/announcements/add', {
+                const response = await fetch('/api/announcements/add', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -376,7 +376,7 @@ postButton.addEventListener('click', async () => {
     };
 
     try {
-        const response = await fetch('http://localhost:8082/api/announcements/add', {
+        const response = await fetch('/api/announcements/add', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -409,8 +409,7 @@ postButton.addEventListener('click', async () => {
 });
 </script>
 <script src="admin-auth-helper.js"></script>
-<script src="auth.js"></script>
-<script src="auth-helper.js"></script>
+<script src="admin-auth.js"></script>
 </body>
 </html>
    
